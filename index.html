@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    
+    <!-- META TAGS - SEO -->
+    <title>Ideaventurex - Where Problems Become Ventures | Problem Owner & Developer Marketplace</title>
+    <meta name="description" content="IdeaventureX is the first gated marketplace connecting problem owners with verified developers. Post real-world problems, find technical co-founders, and build scalable ventures with IP protection.">
+    <meta name="keywords" content="problem marketplace, developer platform, tech co-founder, startup ideas, problem solver, venture building, developer community, problem owner, tech marketplace, India startup">
+    <meta name="author" content="IdeaventureX">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- CANONICAL TAG -->
+    <link rel="canonical" href="https://ideaventurex.com">
+    
+    <!-- OPEN GRAPH TAGS - Facebook/LinkedIn -->
+    <meta property="og:title" content="IdeaventureX - Where Problems Become Ventures">
+    <meta property="og:description" content="Connect with verified developers to solve real-world problems and build successful ventures.">
+    <meta property="og:image" content="https://ideaventurex.com/og-image.jpg">
+    <meta property="og:url" content="https://ideaventurex.com">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Ideaventurex">
+    
+    <!-- TWITTER CARD TAGS -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="IdeaventureX - Where Problems Become Ventures">
+    <meta name="twitter:description" content="First gated marketplace connecting problem owners with verified developers.">
+    <meta name="twitter:image" content="https://ideaventurex.com/twitter-image.jpg">
+    
+    <!-- FAVICON -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%232D5FFF'/><text x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial'>P</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%232D5FFF'/><text x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial'>P</text></svg>">
+    
+    <!-- SCHEMA MARKUP - JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "IdeaventureX",
+        "url": "https://.com",
+        "logo": "https://ideaventurex.com/logo.png",
+        "sameAs": [
+            "https://twitter.com/Ideaventurex
+            "https://linkedin.com/company/Ideaventurex"
+        ],
+        "description": "First gated marketplace connecting problem owners with verified builders.",
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "IN"
+        }
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Ideaventurex",
+        "url": "https://ideaventurex.com",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://ideaventurex.com/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+
+    <!-- CSS FILES -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo" onclick="switchPage('home')">
+            <div class="bulb-icon">
+                <div class="bulb-glass"></div>
+                <div class="bulb-base"></div>
+                <div class="bulb-filament"></div>
+            </div>
+            <div class="logo-text"><span>Idea</span>ventureX</div>
+        </div>
+        <div class="nav-links" id="navLinks">
+            <a class="active" onclick="switchPage('home')">HOME</a>
+            <a onclick="switchPage('explore')">EXPLORE</a>
+            <a onclick="switchPage('stories')">STORIES</a>
+            <a onclick="switchPage('advertise')">ADVERTISE</a>
+            <a onclick="switchPage('admin')">ADMIN</a>
+        </div>
+        <div class="nav-right">
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </div>
+            <div class="auth-buttons" id="authButtons">
+                <button class="btn-outline" onclick="openModal('login')">SIGN IN</button>
+                <button class="btn-primary" onclick="openModal('signup')">JOIN</button>
+            </div>
+            <div class="profile-badge" id="profileBadge" onclick="toggleLogout(event)">
+                <div class="avatar">AK</div>
+                <span id="profileType">BUILDER</span>
+                <span class="notification-badge">3</span>
+                <div class="logout-dropdown" id="logoutDropdown" onclick="event.stopPropagation()">
+                    <a onclick="switchPage('dashboard'); event.stopPropagation();">📊 DASHBOARD</a>
+                    <a onclick="openEditProfileModal(); event.stopPropagation();">✏️ EDIT PROFILE</a>
+                    <a onclick="logout(); event.stopPropagation();">🚪 LOGOUT</a>
+                </div>
+            </div>
+            <div class="hamburger-menu" onclick="toggleMobileMenu()">☰</div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu (hidden by default) -->
+    <div id="mobileMenu" style="display: none; background: var(--card-bg); padding: 20px; position: absolute; top: 80px; left: 0; right: 0; z-index: 99; backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color);">
+        <a style="display: block; padding: 15px; color: var(--text-primary); text-decoration: none; border-bottom: 1px solid var(--border-color);" onclick="switchPage('home'); toggleMobileMenu()">HOME</a>
+        <a style="display: block; padding: 15px; color: var(--text-primary); text-decoration: none; border-bottom: 1px solid var(--border-color);" onclick="switchPage('explore'); toggleMobileMenu()">EXPLORE</a>
+        <a style="display: block; padding: 15px; color: var(--text-primary); text-decoration: none; border-bottom: 1px solid var(--border-color);" onclick="switchPage('stories'); toggleMobileMenu()">STORIES</a>
+        <a style="display: block; padding: 15px; color: var(--text-primary); text-decoration: none; border-bottom: 1px solid var(--border-color);" onclick="switchPage('advertise'); toggleMobileMenu()">ADVERTISE</a>
+        <a style="display: block; padding: 15px; color: var(--text-primary); text-decoration: none;" onclick="switchPage('admin'); toggleMobileMenu()">ADMIN</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <!-- HOME PAGE -->
+        <div id="home-page" class="page active-page">
+            <div class="hero">
+                <div class="hero-left">
+                    <h1>WHERE<br><span class="hero-gradient-text">PROBLEMS</span><br>BECOME VENTURES</h1>
+                    <p>The first gated marketplace connecting problem owners with verified developers. Full traceability, zero noise, mediation ready.</p>
+                    <div class="hero-stats">
+                        <div class="stat-item"><div class="stat-number">342</div><p>PROBLEMS</p></div>
+                        <div class="stat-item"><div class="stat-number">1.8K</div><p>DEVELOPERS</p></div>
+                        <div class="stat-item"><div class="stat-number">97</div><p>MATCHES</p></div>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <h3 style="font-size:24px;">JOIN THE NETWORK</h3>
+                    <div class="type-selector">
+                        <div class="type-option active" onclick="selectType('owner')">PROBLEM OWNER</div>
+                        <div class="type-option" onclick="selectType('developer')">DEVELOPER</div>
+                    </div>
+                    <ul class="usp-list" id="uspList">
+                        <!-- Problem Owner bullets (active by default) -->
+                        <li><i class="fas fa-lightbulb"></i> POST REAL-WORLD PROBLEMS YOU FACE</li>
+                        <li><i class="fas fa-users"></i> CONNECT WITH VERIFIED DEVELOPERS</li>
+                        <li><i class="fas fa-shield-alt"></i> IP PROTECTION & NDA READY</li>
+                        <li><i class="fas fa-chart-line"></i> TURN IDEAS INTO SCALABLE VENTURES</li>
+                    </ul>
+                    <button class="btn-primary" style="width:100%; padding:14px;" onclick="openModal('signup')">CREATE ACCOUNT →</button>
+                </div>
+            </div>
+
+            <div class="category-bar">
+                <div class="category-links">
+                    <span class="category-link active" onclick="filterProblems('all', event)">ALL</span>
+                    <span class="category-link" onclick="filterProblems('tech', event)">TECH</span>
+                    <span class="category-link" onclick="filterProblems('health', event)">HEALTH</span>
+                    <span class="category-link" onclick="filterProblems('finance', event)">FINANCE</span>
+                    <span class="category-link" onclick="filterProblems('edu', event)">EDU</span>
+                    <span class="category-link" onclick="filterProblems('agri', event)">AGRI</span>
+                </div>
+                <div class="subscribe-btn" onclick="subscribeAlert()"><i class="far fa-bell"></i> SUBSCRIBE</div>
+            </div>
+
+            <div class="section-header">
+                <h2>LIVE PROBLEMS</h2>
+                <span class="view-all" onclick="switchPage('explore')">VIEW ALL →</span>
+            </div>
+            <div class="problems-grid" id="homeProblemsGrid"></div>
+        </div>
+
+        <!-- EXPLORE PAGE -->
+        <div id="explore-page" class="page">
+            <div style="margin:60px 0;">
+                <h1 style="font-size:56px; margin-bottom:30px;">EXPLORE ALL PROBLEMS</h1>
+                <div class="category-bar">
+                    <div class="category-links">
+                        <span class="category-link active" onclick="filterExploreProblems('all', event)">ALL</span>
+                        <span class="category-link" onclick="filterExploreProblems('tech', event)">TECH</span>
+                        <span class="category-link" onclick="filterExploreProblems('health', event)">HEALTH</span>
+                        <span class="category-link" onclick="filterExploreProblems('finance', event)">FINANCE</span>
+                        <span class="category-link" onclick="filterExploreProblems('edu', event)">EDU</span>
+                        <span class="category-link" onclick="filterExploreProblems('agri', event)">AGRI</span>
+                    </div>
+                </div>
+                <div class="problems-grid" id="exploreProblemsGrid"></div>
+            </div>
+        </div>
+
+        <!-- STORIES PAGE -->
+        <div id="stories-page" class="page">
+            <div style="margin:60px 0;">
+                <h1 style="font-size:56px; margin-bottom:30px;">SUCCESS STORIES</h1>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;" id="storiesGrid"></div>
+            </div>
+        </div>
+
+        <!-- ADVERTISE PAGE -->
+        <div id="advertise-page" class="page">
+            <div class="advertise-page">
+                <div class="advertise-header">
+                    <h1>REACH 1.8K+ ELITE DEVELOPERS</h1>
+                    <p>Promote your tools, APIs, and services to the most active problem solvers and innovators in our network.</p>
+                </div>
+                
+                <div class="advertise-pricing" id="pricingCards"></div>
+
+                <div class="details-form">
+                    <h2>📋 REQUEST ADVERTISING DETAILS</h2>
+                    
+                    <div class="form-group">
+                        <label>FULL NAME</label>
+                        <input type="text" placeholder="Enter your full name" id="adName">
+                    </div>
+                    <div class="form-group">
+                        <label>COMPANY/BRAND</label>
+                        <input type="text" placeholder="Enter company name" id="adCompany">
+                    </div>
+                    <div class="form-group">
+                        <label>EMAIL ADDRESS</label>
+                        <input type="email" placeholder="Enter your email" id="adEmail">
+                    </div>
+                    <div class="form-group">
+                        <label>PHONE NUMBER</label>
+                        <input type="tel" placeholder="Enter your phone number" id="adPhone">
+                    </div>
+                    <div class="form-group">
+                        <label>SELECT PACKAGE</label>
+                        <select id="adPackage">
+                            <option>BASIC - ₹2,999/month</option>
+                            <option>PRO - ₹4,999/month</option>
+                            <option>ENTERPRISE - ₹9,999/month</option>
+                            <option>CUSTOM - Need tailored solution</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>TELL US ABOUT YOUR PRODUCT</label>
+                        <textarea placeholder="Describe your product, target audience, and advertising goals..." id="adMessage"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>PREFERRED START DATE</label>
+                        <input type="date" id="adDate">
+                    </div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="checkbox" id="adTerms"> I agree to terms and conditions
+                        </div>
+                    </div>
+                    <button class="btn-primary" style="width:100%; padding:16px;" onclick="submitAdRequest()">SUBMIT REQUEST</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD PAGE -->
+        <div id="dashboard-page" class="page">
+            <div class="dashboard-page">
+                <div class="dashboard-header">
+                    <h1>YOUR DASHBOARD</h1>
+                    <div class="date" id="currentDate"></div>
+                </div>
+
+                <div class="profile-header">
+                    <div class="profile-avatar-large">AK</div>
+                    <div class="profile-info">
+                        <h2>ALEX KUMAR</h2>
+                        <p>DEVELOPER · MEMBER SINCE 2025 · VERIFIED ✓</p>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="profile-stat-item"><div class="number">12</div><div class="label">PROBLEMS</div></div>
+                        <div class="profile-stat-item"><div class="number">5</div><div class="label">INTERESTS</div></div>
+                        <div class="profile-stat-item"><div class="number">2</div><div class="label">MATCHES</div></div>
+                    </div>
+                </div>
+
+                <div class="dashboard-tabs">
+                    <div class="dashboard-tab active" onclick="switchDashboardTab('overview')">OVERVIEW</div>
+                    <div class="dashboard-tab" onclick="switchDashboardTab('problems')">MY PROBLEMS</div>
+                    <div class="dashboard-tab" onclick="switchDashboardTab('interests')">INTERESTS</div>
+                    <div class="dashboard-tab" onclick="switchDashboardTab('matches')">MATCHES</div>
+                </div>
+
+                <div id="overview-tab">
+                    <div class="dashboard-stats-grid" id="dashboardStats"></div>
+                    <div class="activity-section">
+                        <div class="activity-header">
+                            <h3>📈 ACTIVITY OVERVIEW</h3>
+                            <span class="view-all" onclick="showToast('VIEW DETAILS')">DETAILS →</span>
+                        </div>
+                        <div class="activity-chart" id="activityChart"></div>
+                    </div>
+                    <h3 class="section-title">RECENT MATCHES</h3>
+                    <div class="matches-grid" id="recentMatches"></div>
+                </div>
+
+                <div id="problems-tab" style="display:none;">
+                    <h3 class="section-title">YOUR PROBLEMS</h3>
+                    <div class="problems-list" id="myProblemsList"></div>
+                    <button class="btn-primary" onclick="showToast('CREATE NEW PROBLEM')">+ POST NEW PROBLEM</button>
+                </div>
+
+                <div id="interests-tab" style="display:none;">
+                    <h3 class="section-title">YOUR INTERESTS</h3>
+                    <div class="interests-grid" id="interestsGrid"></div>
+                </div>
+
+                <div id="matches-tab" style="display:none;">
+                    <h3 class="section-title">ACTIVE MATCHES</h3>
+                    <div class="matches-grid" id="matchesGrid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN PAGE -->
+        <div id="admin-page" class="page">
+            <div id="adminLoginBox" class="admin-login-box">
+                <h2>ADMIN ACCESS</h2>
+                <input type="email" placeholder="admin@ideaventurex.com" value="admin@ideaventurex.com" id="adminEmail">
+                <input type="password" placeholder="••••••••" value="admin123" id="adminPassword">
+                <button class="btn-primary" onclick="adminLogin()">ACCESS DASHBOARD</button>
+            </div>
+            <div id="adminPanel" class="admin-panel">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                    <h2 style="font-size:36px;">ADMIN INTELLIGENCE</h2>
+                    <div class="profile-badge" style="display:flex; position:relative;" id="adminProfileBadge">
+                        <div class="avatar">AD</div>
+                        <span>ADMIN</span>
+                        <div class="logout-dropdown" id="adminLogoutDropdown">
+                            <a onclick="logout(); closeAdminDropdown();">🚪 LOGOUT</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-stats">
+                    <div class="stat-card-large"><h3>47</h3><p>LIVE PROBLEMS</p></div>
+                    <div class="stat-card-large"><h3>238</h3><p>DEVELOPERS</p></div>
+                    <div class="stat-card-large"><h3>15</h3><p>MATCHES</p></div>
+                    <div class="stat-card-large"><h3>89</h3><p>WEEKLY ACTIVE</p></div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                    <div class="admin-section">
+                        <h3>⏳ PENDING VERIFICATION</h3>
+                        <div class="queue-item"><span>AI DIAGNOSTIC TOOL</span> <button class="verify-btn" onclick="showToast('VERIFIED')">VERIFY</button></div>
+                        <div class="queue-item"><span>ELDERLY CARE IOT</span> <button class="verify-btn" onclick="showToast('VERIFIED')">VERIFY</button></div>
+                        <div class="queue-item"><span>FARMER MARKETPLACE</span> <button class="verify-btn" onclick="showToast('VERIFIED')">VERIFY</button></div>
+                    </div>
+                    <div class="admin-section">
+                        <h3>🔥 TRENDING SECTORS</h3>
+                        <div class="trend-item"><span>TECH</span> <span>42%</span></div>
+                        <div class="trend-item"><span>HEALTH</span> <span>28%</span></div>
+                        <div class="trend-item"><span>FINTECH</span> <span>18%</span></div>
+                        <div class="trend-item"><span>EDU</span> <span>8%</span></div>
+                        <div class="trend-item"><span>AGRI</span> <span>4%</span></div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>👁️ ACCESS LOG</h3>
+                    <div class="log-item">PRIYA S. viewed AI DIAGNOSTIC · 2 min ago</div>
+                    <div class="log-item">RAHUL K. unlocked TELEMEDICINE · 15 min ago</div>
+                    <div class="log-item">ANAND M. posted new problem · 1 hour ago</div>
+                    <div class="log-item">SUNITA P. matched with developer · 3 hours ago</div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>🤝 MATCH QUEUE</h3>
+                    <div class="queue-item"><span>AI TOOL · Developer: PRIYA S.</span> <span style="color:var(--gradient-1);">PENDING</span></div>
+                    <div class="queue-item"><span>TELEMEDICINE · Developer: RAHUL K.</span> <span style="color:var(--gradient-3);">ACCEPTED</span></div>
+                    <div class="queue-item"><span>MICRO-CREDIT · Developer: ANAND M.</span> <span style="color:var(--gradient-2);">IN REVIEW</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h4>PRODUCT</h4>
+                    <a onclick="showPage('newsletter')">Newsletter</a>
+                    <a onclick="showPage('apps')">Apps</a>
+                    <a onclick="showPage('about')">About</a>
+                    <a onclick="showPage('faq')">FAQ</a>
+                </div>
+                <div class="footer-section">
+                    <h4>LEGAL</h4>
+                    <a onclick="showPage('terms')">Terms</a>
+                    <a onclick="showPage('privacy')">Privacy & Cookies</a>
+                    <a onclick="showPage('privacy-choices')">Privacy Choices</a>
+                    <a onclick="showPage('ilms')">Ilms.txt</a>
+                </div>
+                <div class="footer-section">
+                    <h4>COMMUNITY</h4>
+                    <a onclick="showPage('advertise')">Advertise</a>
+                    <a onclick="showPage('contact')">Contact us</a>
+                    <a onclick="showPage('twitter')">Twitter</a>
+                    <a onclick="showPage('linkedin')">LinkedIn</a>
+                </div>
+                <div class="footer-section">
+                    <h4>CATEGORIES</h4>
+                    <a onclick="filterProblems('tech', event)">Engineering & Dev</a>
+                    <a onclick="filterProblems('design', event)">Design & Creative</a>
+                    <a onclick="filterProblems('ai', event)">AI Agents</a>
+                    <a onclick="filterProblems('finance', event)">Finance</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div>© 2026 Ideaventurex. All rights reserved.</div>
+                <div class="footer-bottom-links">
+                    <a onclick="showPage('newsletter')">Newsletter</a>
+                    <a onclick="showPage('apps')">Apps</a>
+                    <a onclick="showPage('about')">About</a>
+                    <a onclick="showPage('faq')">FAQ</a>
+                    <a onclick="showPage('terms')">Terms</a>
+                    <a onclick="showPage('privacy')">Privacy</a>
+                </div>
+                <div class="footer-contact">
+                    <span>Contact:</span> hello@ideaventurex.com
+                </div>
+            </div>
+
+            <!-- POWERED BY OPTIVRA -->
+            <div class="powered-by">
+                POWERED BY <span>OPTIVRA</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- NEW PAGES MODAL -->
+    <div class="modal" id="pageModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('pageModal')">&times;</span>
+            <h2 id="pageModalTitle">Page Title</h2>
+            <div id="pageModalContent" style="color: var(--text-secondary); line-height: 1.8;">
+                Content goes here...
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>SIGN IN</h2>
+            <input type="email" placeholder="EMAIL" id="loginEmail">
+            <input type="password" placeholder="PASSWORD" id="loginPassword">
+            <button class="btn-primary" style="width:100%;" onclick="demoLogin()">SIGN IN</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="signupModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signupModal')">&times;</span>
+            <h2>JOIN IDEAVENTUREX</h2>
+            <input type="text" placeholder="FULL NAME" id="signupName">
+            <input type="email" placeholder="EMAIL" id="signupEmail">
+            <input type="password" placeholder="PASSWORD" id="signupPassword">
+            <select id="signupRole">
+                <option>PROBLEM OWNER</option>
+                <option>DEVELOPER</option>
+                <option>ADVISOR</option>
+            </select>
+            <div class="otp-row">
+                <input type="text" placeholder="OTP" id="otpInput">
+                <button class="btn-outline" onclick="showToast('OTP SENT')">SEND</button>
+            </div>
+            <button class="btn-primary" style="width:100%; margin-top:20px;" onclick="demoSignup()">CREATE ACCOUNT</button>
+        </div>
+    </div>
+
+    <!-- EDIT PROFILE MODAL -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editProfileModal')">&times;</span>
+            <h2>EDIT PROFILE</h2>
+            
+            <div class="edit-profile-options">
+                <div class="edit-profile-option" onclick="showToast('EDIT NAME - COMING SOON'); closeModal('editProfileModal');">
+                    <i class="fas fa-user"></i>
+                    <div class="option-text"><h4>EDIT NAME</h4><p>Change your display name</p></div>
+                </div>
+                <div class="edit-profile-option" onclick="showToast('EDIT EMAIL - COMING SOON'); closeModal('editProfileModal');">
+                    <i class="fas fa-envelope"></i>
+                    <div class="option-text"><h4>EDIT EMAIL</h4><p>Update your email address</p></div>
+                </div>
+                <div class="edit-profile-option" onclick="showToast('EDIT PASSWORD - COMING SOON'); closeModal('editProfileModal');">
+                    <i class="fas fa-lock"></i>
+                    <div class="option-text"><h4>EDIT PASSWORD</h4><p>Change your password</p></div>
+                </div>
+                <div class="edit-profile-option danger-option" onclick="if(confirm('Are you sure?')) { showToast('ACCOUNT DELETED'); logout(); } closeModal('editProfileModal');">
+                    <i class="fas fa-trash-alt"></i>
+                    <div class="option-text"><h4>DELETE ACCOUNT</h4><p>Permanently delete account</p></div>
+                </div>
+            </div>
+            <button class="btn-outline" style="width:100%; margin-top:10px;" onclick="closeModal('editProfileModal')">CLOSE</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">MESSAGE</div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
