@@ -146,7 +146,7 @@
                         <div class="stat-item"><div class="stat-number">97</div><p>MATCHES</p></div>
                     </div>
                 </div>
-                <div class="hero-right">
+                <div class="hero-right" style="position: relative; z-index: 1;">
                     <h3 style="font-size:24px;">JOIN THE NETWORK</h3>
                     <div class="type-selector">
                         <div class="type-option active" onclick="selectType('owner')">PROBLEM OWNER</div>
@@ -154,10 +154,10 @@
                     </div>
                     <ul class="usp-list" id="uspList">
                         <!-- Problem Owner bullets (active by default) -->
-                        <li><i class="fas fa-lightbulb"></i> POST REAL-WORLD PROBLEMS YOU FACE</li>
-                        <li><i class="fas fa-users"></i> CONNECT WITH VERIFIED DEVELOPERS</li>
-                        <li><i class="fas fa-shield-alt"></i> IP PROTECTION & NDA READY</li>
-                        <li><i class="fas fa-chart-line"></i> TURN IDEAS INTO SCALABLE VENTURES</li>
+                        <li><i class="fas fa-lightbulb"></i> Post real-world problems you face</li>
+                        <li><i class="fas fa-users"></i> Connect with verified developers</li>
+                        <li><i class="fas fa-shield-alt"></i> IP protection & NDA ready</li>
+                        <li><i class="fas fa-chart-line"></i> Turn ideas into scalable ventures</li>
                     </ul>
                     <button class="btn-primary" style="width:100%; padding:14px; font-size:14px; letter-spacing:1px;" onclick="openModal('signup')">CREATE ACCOUNT &rarr;</button>
                 </div>
@@ -165,7 +165,7 @@
 
             <!-- ROADMAP SECTION -->
             <div class="roadmap-section" style="margin: 80px 0; padding: 60px; background: rgba(255, 255, 255, 0.02); border-radius: 40px; border: 1px solid var(--border-color); text-align: center; backdrop-filter: blur(10px);">
-                <h2 style="font-size: 40px; margin-bottom: 20px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">HOW IT WORKS</h2>
+                <h2 style="font-size: 40px; margin-bottom: 20px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">HOW IT WORKS</h2>
                 <p style="color: var(--text-secondary); margin-bottom: 50px;">Follow our simple roadmap to find your dream team and build your startup idea.</p>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
                     <div class="roadmap-step" style="padding: 30px; background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='var(--gradient-1)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
@@ -363,7 +363,15 @@
         <div class="modal-content auth-container">
             <span class="close" onclick="closeModal('authModal')">&times;</span>
             <div id="loginView">
-                <div class="auth-header">
+                <div class="auth-header" style="text-align: center;">
+                    <div class="logo" style="justify-content: center; margin-bottom: 20px; cursor: default;">
+                        <div class="bulb-icon">
+                            <div class="bulb-glass"></div>
+                            <div class="bulb-base"></div>
+                            <div class="bulb-filament"></div>
+                        </div>
+                        <div class="logo-text"><span>Idea</span>ventureX</div>
+                    </div>
                     <h2>Welcome Back</h2>
                     <p>Enter your credentials to access your account</p>
                 </div>
@@ -375,15 +383,22 @@
                         <i class="fab fa-apple"></i> Sign in with Apple
                     </button>
                 </div>
-                <div class="divider"><span>OR CONTINUE WITH EMAIL</span></div>
+                <div class="divider"><span>OR CONTINUE WITH EMAIL OR PHONE</span></div>
                 
                 <div class="form-group input-icon-wrapper">
-                    <i class="fas fa-envelope input-icon"></i>
-                    <input type="email" placeholder="Email Address" id="loginEmail" class="premium-input">
+                    <i class="fas fa-envelope input-icon" id="loginIdIcon"></i>
+                    <input type="text" placeholder="Email Address or Phone Number" id="loginEmail" class="premium-input" oninput="detectInputType(this, 'loginIdIcon', 'login')">
                 </div>
-                <div class="form-group input-icon-wrapper">
+                <div class="form-group input-icon-wrapper" id="loginPasswordWrapper">
                     <i class="fas fa-lock input-icon"></i>
                     <input type="password" placeholder="Password" id="loginPassword" class="premium-input">
+                </div>
+                <div class="otp-row" id="loginOtpGroup" style="display: none; margin-bottom: 16px;">
+                    <div class="input-icon-wrapper" style="flex: 1;">
+                        <i class="fas fa-shield-alt input-icon"></i>
+                        <input type="text" placeholder="SMS OTP" id="loginOtpInput" class="premium-input">
+                    </div>
+                    <button class="btn-outline otp-btn" onclick="sendOTP('login')">SEND OTP</button>
                 </div>
                 
                 <div style="text-align: right; margin-bottom: 24px;">
@@ -396,9 +411,17 @@
             </div>
 
             <div id="signupView" style="display: none;">
-                <div class="auth-header">
-                    <h2>Join IdeaventureX</h2>
-                    <p>Create an account to connect & innovate</p>
+                <div class="auth-header" style="text-align: center;">
+                    <div class="logo" style="justify-content: center; margin-bottom: 20px; cursor: default;">
+                        <div class="bulb-icon">
+                            <div class="bulb-glass"></div>
+                            <div class="bulb-base"></div>
+                            <div class="bulb-filament"></div>
+                        </div>
+                        <div class="logo-text"><span>Idea</span>ventureX</div>
+                    </div>
+                    <h2>Create an Account</h2>
+                    <p>Join the network to connect & innovate</p>
                 </div>
                 <div class="social-auth">
                     <button class="social-btn google" onclick="showToast('GOOGLE SIGNUP - STUB')">
@@ -408,17 +431,17 @@
                         <i class="fab fa-apple"></i> Sign up with Apple
                     </button>
                 </div>
-                <div class="divider"><span>OR CONTINUE WITH EMAIL</span></div>
+                <div class="divider"><span>OR CONTINUE WITH EMAIL OR PHONE</span></div>
                 
                 <div class="form-group input-icon-wrapper">
                     <i class="fas fa-user input-icon"></i>
                     <input type="text" placeholder="Full Name" id="signupName" class="premium-input">
                 </div>
                 <div class="form-group input-icon-wrapper">
-                    <i class="fas fa-envelope input-icon"></i>
-                    <input type="email" placeholder="Email Address" id="signupEmail" class="premium-input">
+                    <i class="fas fa-envelope input-icon" id="signupIdIcon"></i>
+                    <input type="text" placeholder="Email Address or Phone Number" id="signupEmail" class="premium-input" oninput="detectInputType(this, 'signupIdIcon', 'signup')">
                 </div>
-                <div class="form-group input-icon-wrapper">
+                <div class="form-group input-icon-wrapper" id="signupPasswordWrapper">
                     <i class="fas fa-lock input-icon"></i>
                     <input type="password" placeholder="Password" id="signupPassword" class="premium-input">
                 </div>
@@ -431,27 +454,12 @@
                     </select>
                 </div>
                 
-                <div class="form-group phone-group">
-                    <select id="phoneCode" class="premium-input country-code">
-                        <option value="+1">+1 (US)</option>
-                        <option value="+44">+44 (UK)</option>
-                        <option value="+91">+91 (IN)</option>
-                        <option value="+61">+61 (AU)</option>
-                        <option value="+81">+81 (JP)</option>
-                        <option value="+49">+49 (DE)</option>
-                    </select>
-                    <div class="input-icon-wrapper phone-input-wrapper">
-                        <i class="fas fa-phone input-icon"></i>
-                        <input type="tel" placeholder="Phone Number" id="signupPhone" class="premium-input" style="padding-left: 36px;">
-                    </div>
-                </div>
-
-                <div class="otp-row">
+                <div class="otp-row" id="signupOtpGroup" style="display: none; margin-bottom: 16px;">
                     <div class="input-icon-wrapper" style="flex: 1;">
                         <i class="fas fa-shield-alt input-icon"></i>
-                        <input type="text" placeholder="SMS OTP" id="otpInput" class="premium-input">
+                        <input type="text" placeholder="SMS OTP" id="signupOtpInput" class="premium-input">
                     </div>
-                    <button class="btn-outline otp-btn" onclick="sendOTP()">SEND OTP</button>
+                    <button class="btn-outline otp-btn" onclick="sendOTP('signup')">SEND OTP</button>
                 </div>
                 
                 <button class="btn-primary auth-submit" onclick="demoSignup()">CREATE ACCOUNT</button>

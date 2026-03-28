@@ -85,31 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Type selector functionality
-    const typeOptions = document.querySelectorAll('.type-option');
-    typeOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            typeOptions.forEach(opt => opt.classList.remove('active'));
-            this.classList.add('active');
-            
-            const uspList = document.getElementById('uspList');
-            if (this.textContent.includes('PROBLEM OWNER')) {
-                uspList.innerHTML = `
-                    <li><i class="fas fa-lightbulb"></i> POST REAL-WORLD PROBLEMS YOU FACE</li>
-                    <li><i class="fas fa-users"></i> CONNECT WITH VERIFIED DEVELOPERS</li>
-                    <li><i class="fas fa-shield-alt"></i> IP PROTECTION & NDA READY</li>
-                    <li><i class="fas fa-chart-line"></i> TURN IDEAS INTO SCALABLE VENTURES</li>
-                `;
-            } else {
-                uspList.innerHTML = `
-                    <li><i class="fas fa-code"></i> WORK ON REAL PROBLEMS WITH IMPACT</li>
-                    <li><i class="fas fa-briefcase"></i> FIND CO-FOUNDERS & PAYING PROJECTS</li>
-                    <li><i class="fas fa-award"></i> BUILD PORTFOLIO & GET RECOGNITION</li>
-                    <li><i class="fas fa-handshake"></i> JOIN A COMMUNITY OF TOP DEVELOPERS</li>
-                `;
-            }
-        });
-    });
+    // Type selector functionality is handled by the inline onclick attributes calling selectType()
 
     checkSession();
     loadProblems();
@@ -203,7 +179,7 @@ function loadProblems() {
 
 function createProblemCard(p) {
     if (p.locked) {
-        return `<div class="problem-card"><div class="card-badges"><span class="badge industry">${p.category}</span><span class="badge intent">${p.intent}</span><span class="badge status">LIVE</span></div><div class="problem-title">${p.title}</div><div class="blur-container"><div class="blur-content problem-desc">${p.desc}</div><div class="unlock-overlay" onclick="showToast('VERIFY OTP TO UNLOCK')">VERIFY</div></div><div class="card-footer"><span class="view-count"><i class="far fa-eye"></i> ${p.views}</span><div><span class="user-avatar-sm">${p.user}</span> <span class="timestamp">${p.time}</span></div></div></div>`;
+        return `<div class="problem-card"><div class="card-badges"><span class="badge industry">${p.category}</span><span class="badge intent">${p.intent}</span><span class="badge status">LIVE</span></div><div class="problem-title">${p.title}</div><div class="blur-container"><div class="blur-content problem-desc">${p.desc}</div><div class="unlock-overlay" onclick="openAuthModal('login')">LOGIN TO VIEW</div></div><div class="card-footer"><span class="view-count"><i class="far fa-eye"></i> ${p.views}</span><div><span class="user-avatar-sm">${p.user}</span> <span class="timestamp">${p.time}</span></div></div></div>`;
     } else {
         return `<div class="problem-card"><div class="card-badges"><span class="badge industry">${p.category}</span><span class="badge intent">${p.intent}</span><span class="badge status">LIVE</span></div><div class="problem-title">${p.title}</div><div class="problem-desc">${p.desc}</div><div class="card-footer"><button class="interest-btn" onclick="showToast('INTEREST SENT')">REQUEST</button><span class="view-count"><i class="far fa-eye"></i> ${p.views} <span class="timestamp">${p.time}</span></span></div></div>`;
     }
@@ -381,24 +357,29 @@ function switchDashboardTab(tab) {
 }
 
 function selectType(type) {
-    document.querySelectorAll('.type-option').forEach(o => o.classList.remove('active'));
-    event.target.classList.add('active');
+    document.querySelectorAll('.type-option').forEach(o => {
+        o.classList.remove('active');
+        if (o.textContent.toLowerCase().includes(type.toLowerCase())) {
+            o.classList.add('active');
+        }
+    });
+
     userType = type;
     
     const uspList = document.getElementById('uspList');
     if (type === 'owner') {
         uspList.innerHTML = `
-            <li><i class="fas fa-lightbulb"></i> POST REAL-WORLD PROBLEMS YOU FACE</li>
-            <li><i class="fas fa-users"></i> CONNECT WITH VERIFIED DEVELOPERS</li>
-            <li><i class="fas fa-shield-alt"></i> IP PROTECTION & NDA READY</li>
-            <li><i class="fas fa-chart-line"></i> TURN IDEAS INTO SCALABLE VENTURES</li>
+            <li><i class="fas fa-lightbulb"></i> Post real-world problems you face</li>
+            <li><i class="fas fa-users"></i> Connect with verified developers</li>
+            <li><i class="fas fa-shield-alt"></i> IP protection & NDA ready</li>
+            <li><i class="fas fa-chart-line"></i> Turn ideas into scalable ventures</li>
         `;
     } else {
         uspList.innerHTML = `
-            <li><i class="fas fa-code"></i> WORK ON REAL PROBLEMS WITH IMPACT</li>
-            <li><i class="fas fa-briefcase"></i> FIND CO-FOUNDERS & PAYING PROJECTS</li>
-            <li><i class="fas fa-award"></i> BUILD PORTFOLIO & GET RECOGNITION</li>
-            <li><i class="fas fa-handshake"></i> JOIN A COMMUNITY OF TOP DEVELOPERS</li>
+            <li><i class="fas fa-code"></i> Work on real problems with impact</li>
+            <li><i class="fas fa-briefcase"></i> Find co-founders & paying projects</li>
+            <li><i class="fas fa-award"></i> Build portfolio & get recognition</li>
+            <li><i class="fas fa-handshake"></i> Join a community of top developers</li>
         `;
     }
 }
@@ -446,13 +427,34 @@ function openEditProfileModal() {
     openModal('editProfile');
 }
 
+function detectInputType(input, iconId, mode) {
+    const val = input.value.trim();
+    const icon = document.getElementById(iconId);
+    if (!icon) return;
+
+    // Check if phone (starts with + or contains mostly numbers)
+    const isPhone = /^[\d+\-\s()]+$/.test(val) && val.replace(/\D/g, '').length >= 7;
+
+    if (isPhone) {
+        icon.className = 'fas fa-phone input-icon';
+        document.getElementById(mode + 'PasswordWrapper').style.display = 'none';
+        document.getElementById(mode + 'OtpGroup').style.display = 'flex';
+    } else {
+        icon.className = 'fas fa-envelope input-icon';
+        document.getElementById(mode + 'PasswordWrapper').style.display = 'flex';
+        document.getElementById(mode + 'OtpGroup').style.display = 'none';
+    }
+}
+
 function demoLogin() {
-    const email = document.getElementById('loginEmail').value;
-    const pass = document.getElementById('loginPassword').value;
+    const inputVal = document.getElementById('loginEmail').value.trim();
+    const isPhone = /^[\d+\-\s()]+$/.test(inputVal) && inputVal.replace(/\D/g, '').length >= 7;
+    
+    const pass = isPhone ? document.getElementById('loginOtpInput').value : document.getElementById('loginPassword').value;
     
     const fd = new FormData();
     fd.append('action', 'login');
-    fd.append('email', email);
+    fd.append('email', inputVal); // Use inputVal as the identifier, backend handles
     fd.append('password', pass);
     
     fetch('api/auth.php', {method: 'POST', body: fd})
@@ -474,14 +476,15 @@ function demoLogin() {
 
 function demoSignup() {
     const name = document.getElementById('signupName').value;
-    const email = document.getElementById('signupEmail').value;
-    const pass = document.getElementById('signupPassword').value;
-    const role = document.getElementById('signupRole').value;
-    const phoneCode = document.getElementById('phoneCode').value;
-    const phoneNum = document.getElementById('signupPhone').value;
+    const inputVal = document.getElementById('signupEmail').value.trim();
     
-    // Combine phone code and number for the DB
-    const globalPhone = phoneNum ? `${phoneCode}${phoneNum}` : '';
+    const isPhone = /^[\d+\-\s()]+$/.test(inputVal) && inputVal.replace(/\D/g, '').length >= 7;
+    
+    const email = isPhone ? '' : inputVal;
+    const phone = isPhone ? inputVal : '';
+    const pass = isPhone ? document.getElementById('signupOtpInput').value : document.getElementById('signupPassword').value;
+    
+    const role = document.getElementById('signupRole').value;
     
     const fd = new FormData();
     fd.append('action', 'register');
@@ -489,7 +492,7 @@ function demoSignup() {
     fd.append('email', email);
     fd.append('password', pass);
     fd.append('role', role);
-    fd.append('phone', globalPhone);
+    fd.append('phone', phone);
 
     fetch('api/auth.php', {method: 'POST', body: fd})
     .then(r => r.json())
@@ -508,19 +511,18 @@ function demoSignup() {
     });
 }
 
-function sendOTP() {
-    const phoneCode = document.getElementById('phoneCode').value;
-    const phoneNum = document.getElementById('signupPhone').value;
+function sendOTP(mode) {
+    const inputId = mode === 'signup' ? 'signupEmail' : 'loginEmail';
+    const phoneNum = document.getElementById(inputId).value.trim();
     
     if(!phoneNum) {
         showToast('Please enter a phone number first');
         return;
     }
     
-    const globalPhone = `${phoneCode}${phoneNum}`;
     const fd = new FormData();
     fd.append('action', 'send_otp');
-    fd.append('phone', globalPhone);
+    fd.append('phone', phoneNum);
     
     fetch('api/auth.php', {method: 'POST', body: fd})
     .then(r => r.json())

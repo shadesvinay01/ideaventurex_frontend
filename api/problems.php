@@ -21,8 +21,9 @@ if ($action === 'list') {
     $raw_problems = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     $problems = [];
+    $index = 0;
     foreach($raw_problems as $p) {
-        $locked = !$isLoggedIn; 
+        $locked = (!$isLoggedIn && $index >= 5); 
         
         $desc = $p['description'];
         if ($locked) {
@@ -49,6 +50,7 @@ if ($action === 'list') {
             "user" => strtoupper(substr($p['user_name'], 0, 2)), // "PS" style Initials
             "time" => $time_str
         ];
+        $index++;
     }
     echo json_encode(["status" => "success", "data" => $problems]);
 }
