@@ -81,3 +81,24 @@ The codebase currently contains UI elements for OAuth (Google & Apple) under the
 - The Registration form now captures a global **Phone Number** with a Country Code.
 - When a user clicks **"SEND OTP"**, it fires an AJAX request to `api/auth.php?action=send_otp` passing the `phone` variable.
 - **To make this live**: Open `api/auth.php` and locate `elseif ($action === 'send_otp')`. Replace the `error_log` stub with an API call to an SMS provider (e.g., **Twilio**, **MessageBird**, or **Fast2SMS** in India) to dynamically dispatch the generated `$otp` to `$phone`.
+
+---
+
+## 5. Local Testing & Strict Authentication Flows
+The platform now uses a **Strict Authentication Flow** that automatically forces Email Verification or Phone OTPs based on the user's input. For local testing without a live SMTP or SMS provider, follow these steps:
+
+### Testing Phone Registration & Login (OTP)
+1. In the Signup/Login modal, type a phone number (e.g., `+1234567890`). The UI will automatically switch to OTP mode.
+2. Click **SEND OTP**. A green toast will appear saying `OTP sent! (Demo OTP: XXXXXX)`.
+3. Note the 6-digit number shown in the toast. (Alternatively, check your PHP Error Logs, as `auth.php` uses `error_log()` to print it).
+4. Enter this exact OTP into the input field and click **CREATE ACCOUNT** (or **SIGN IN**).
+5. If successful, you will be authenticated and routed to the dashboard. Ensure you use the exact same phone number + new OTP next time you login.
+
+### Testing Email Registration (Verify Email)
+1. In the Signup modal, type an email address.
+2. Fill out the password and click **CREATE ACCOUNT**.
+3. You will immediately be routed to the **Verify Your Email** screen, and you will *not* be logged in directly. 
+4. If you manually refresh or check your dashboard later, you will see a red **[Email Not Verified]** badge. 
+5. To test verification logic (once your SMTP links are built), you will create an endpoint in `api/auth.php` that flips `email_verified = 1` in the database.
+
+> **Production Warning:** Do NOT deploy temporary scripts like `temp_migration.php` or `setup_db.php` to a live server after running them once. Delete them immediately after scaffolding the database to prevent unauthorized mock data injection or schema resets.

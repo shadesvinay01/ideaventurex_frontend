@@ -17,12 +17,18 @@ if ($action === 'overview') {
     $ideas_liked = 5; // Hardcoded mock for matched
     $profile_views = 12; // Hardcoded mock
     
+    // User Profile
+    $uStmt = $conn->prepare("SELECT name, email, role, skills, linkedin_url, email_verified FROM users WHERE id = ?");
+    $uStmt->execute([$user_id]);
+    $userParam = $uStmt->fetch(PDO::FETCH_ASSOC);
+    
     echo json_encode([
         "status" => "success",
         "data" => [
             "ideas_posted" => $ideas_posted,
             "ideas_liked" => $ideas_liked,
-            "profile_views" => $profile_views
+            "profile_views" => $profile_views,
+            "profile" => $userParam
         ]
     ]);
 }
@@ -36,9 +42,18 @@ elseif ($action === 'my_ideas') {
 }
 
 elseif ($action === 'update_profile') {
+    $name = $_POST['name'] ?? '';
+    $skills = $_POST['skills'] ?? '';
     $linkedin = $_POST['linkedin'] ?? '';
-    $stmt = $conn->prepare("UPDATE users SET linkedin_url = ? WHERE id = ?");
-    if($stmt->execute([$linkedin, $user_id])) {
+    $role = $_POST['role'] ?? 'owner';
+    
+    // Optional fallback role
+    if (empty($role)) $role = 'owner';
+    
+    $stmt = $conn->prepare("UPDATE users SET name = ?, skills = ?, linkedin_url = ?, role = ? WHERE id = ?");
+    if($stmt->execute([$name, $skills, $linkedin, $role, $user_id])) {
+        $_SESSION['user_name'] = $name;
+        $_SESSION['role'] = $role;
         echo json_encode(["status" => "success", "message" => "Profile updated successfully"]);
     } else {
         echo json_encode(["status" => "error", "message" => "Failed to update profile"]);

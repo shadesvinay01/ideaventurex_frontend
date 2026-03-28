@@ -93,22 +93,21 @@
                 <div class="theme-toggle" onclick="toggleTheme()" style="cursor:pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--card-bg); border: 1px solid var(--border-color);"><i class="fas fa-moon"></i></div>
             </div>
 
+            <div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px;"></div>
             <div class="profile-header" style="background: var(--card-bg); border-radius: 20px; padding: 40px; border: 1px solid var(--border-color); display: flex; flex-wrap: wrap; align-items: center; gap: 30px; margin-bottom: 30px; position:relative; overflow:hidden;">
-                <div class="profile-avatar-large" style="width: 100px; height: 100px; min-width: 100px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: white;">AK</div>
+                <div id="dashAvatar" class="profile-avatar-large" style="width: 100px; height: 100px; min-width: 100px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: white;">--</div>
                 <div class="profile-info" style="flex: 1; z-index:1; min-width: 250px;">
-                    <h2 style="font-size: 32px; margin-bottom: 5px; color: var(--text-primary);">ALEX KUMAR</h2>
-                    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">SENIOR FULL-STACK DEVELOPER · VERIFIED <i class="fas fa-check-circle" style="color:var(--gradient-1);"></i></p>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <span style="font-size: 11px; padding: 4px 12px; border: 1px solid var(--border-color); border-radius: 20px; color: var(--text-secondary);">Node.js</span>
-                        <span style="font-size: 11px; padding: 4px 12px; border: 1px solid var(--border-color); border-radius: 20px; color: var(--text-secondary);">React</span>
-                        <span style="font-size: 11px; padding: 4px 12px; border: 1px solid var(--border-color); border-radius: 20px; color: var(--text-secondary);">Firebase</span>
+                    <div style="display:flex; align-items:center; gap: 15px; margin-bottom: 5px;">
+                        <h2 id="dashName" style="font-size: 32px; color: var(--text-primary);">Loading...</h2>
+                        <span id="emailVerifyBadge" style="font-size: 11px; padding: 4px 12px; border-radius: 20px; background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.3); cursor: pointer;" onclick="requestEmailVerification()">Email Not Verified [Verify]</span>
                     </div>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;"><span id="dashRoleTitle">USER</span> · VERIFIED <i class="fas fa-check-circle" style="color:var(--gradient-1);"></i></p>
+                    <div id="dashSkills" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;"></div>
                 </div>
                 <div style="text-align: right; min-width: 200px;">
-                    <p style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">LinkedIn Profile URL</p>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <input type="text" class="linked-in-input" style="margin:0; flex:1;" placeholder="https://linkedin.com/in/alex" value="https://linkedin.com/in/alexkumar">
-                        <button class="btn-primary" style="padding: 10px 15px; border-radius: 8px; border:none; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); color:white; cursor:pointer;" onclick="alert('Profile Updated Successfully')"><i class="fas fa-save"></i></button>
+                    <button class="btn-primary" style="padding: 12px 25px; border-radius: 30px; border:none; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); color:white; cursor:pointer; font-size: 14px;" onclick="openEditProfile()"><i class="fas fa-edit"></i> Edit Profile</button>
+                    <div style="margin-top: 15px;">
+                        <a id="dashLinkedin" href="#" target="_blank" style="display:none; color: var(--text-secondary); text-decoration: none; font-size: 13px;"><i class="fab fa-linkedin"></i> View LinkedIn</a>
                     </div>
                 </div>
             </div>
@@ -137,33 +136,26 @@
                     <p style="color: var(--text-secondary); margin-bottom: 30px;">Share your concept under NDA to find the perfect technical co-founder. Data is purely handled internally until matched.</p>
                     
                     <label style="display:block; color:var(--text-primary); margin-bottom:10px; font-size:14px;">Idea Title</label>
-                    <input type="text" class="linked-in-input" placeholder="e.g. AI-Powered Healthcare Diagnostics" style="margin-bottom: 25px;">
+                    <input type="text" id="newIdeaTitle" class="linked-in-input" placeholder="e.g. AI-Powered Healthcare Diagnostics" style="margin-bottom: 25px;">
                     
                     <label style="display:block; color:var(--text-primary); margin-bottom:10px; font-size:14px;">Describe the core problem...</label>
-                    <textarea class="linked-in-input" placeholder="I face a problem where..." rows="6" style="margin-bottom: 25px; border-radius: 12px; font-family: 'Inter', sans-serif; resize: vertical;"></textarea>
+                    <textarea id="newIdeaDesc" class="linked-in-input" placeholder="I face a problem where..." rows="6" style="margin-bottom: 25px; border-radius: 12px; font-family: 'Inter', sans-serif; resize: vertical;"></textarea>
 
                     <label style="display:block; color:var(--text-primary); margin-bottom:10px; font-size:14px;">Developer Skills Needed</label>
-                    <input type="text" class="linked-in-input" placeholder="e.g. Python, Machine Learning, AWS" style="margin-bottom: 30px;">
+                    <input type="text" id="newIdeaSkills" class="linked-in-input" placeholder="e.g. Python, Machine Learning, AWS" style="margin-bottom: 30px;">
                     
-                    <button class="btn-primary" style="padding: 15px 30px; border-radius: 30px; font-size: 14px; width: 100%; max-width: 300px; display: block; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); color: white; cursor: pointer; border: none; font-weight: bold; letter-spacing: 1px;" onclick="alert('Success! Your Idea is now live in the global pool under strict IP protection.')">PUBLISH IDEA SECURELY</button>
+                    <div style="display: flex; gap: 15px;">
+                        <button class="btn-outline" style="padding: 15px 30px; border-radius: 30px; font-size: 14px; flex: 1; border-color: var(--text-secondary); color: var(--text-secondary); cursor: pointer; border-width: 1px; border-style: solid; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;" onclick="submitIdea('draft')">SAVE DRAFT</button>
+                        <button class="btn-primary" style="padding: 15px 30px; border-radius: 30px; font-size: 14px; flex: 1; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); color: white; cursor: pointer; border: none; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;" onclick="submitIdea('published')">PUBLISH SECURELY</button>
+                    </div>
                 </div>
             </div>
 
             <div id="my-ideas-tab" class="dash-view" style="display: none;">
                 <h2 style="margin-bottom: 20px; color: var(--text-primary);">Your Posted Ideas</h2>
-                <div style="background: var(--card-bg); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; transition: 0.3s;" onmouseover="this.style.borderColor='var(--gradient-1)'" onmouseout="this.style.borderColor='var(--border-color)'">
-                    <div>
-                        <h4 style="color: var(--text-primary); font-size: 18px;">AI Diagnostics Tool</h4>
-                        <p style="color:var(--text-secondary); font-size:13px; margin-top:8px;">Looking for: Python/ML Developer</p>
-                    </div>
-                    <span style="background: rgba(20, 184, 166, 0.1); color: #14B8A6; padding: 6px 16px; border-radius: 30px; font-size: 12px; font-weight: 600;">LIVE</span>
-                </div>
-                <div style="background: var(--card-bg); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; transition: 0.3s;" onmouseover="this.style.borderColor='var(--gradient-1)'" onmouseout="this.style.borderColor='var(--border-color)'">
-                    <div>
-                        <h4 style="color: var(--text-primary); font-size: 18px;">Fintech Micro-Lending Model</h4>
-                        <p style="color:var(--text-secondary); font-size:13px; margin-top:8px;">Looking for: Blockchain Expert</p>
-                    </div>
-                    <span style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 6px 16px; border-radius: 30px; font-size: 12px; font-weight: 600; border: 1px solid var(--border-color);">DRAFT</span>
+                <div id="myPostedIdeasContainer">
+                    <!-- Ideas dynamically injected -->
+                    <div style="color:var(--text-secondary); font-size:14px;">Loading ideas...</div>
                 </div>
             </div>
 
@@ -192,6 +184,58 @@
         </div>
     </div>
 
+    <!-- Modals -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content" style="max-width: 500px; border-radius: 25px; padding: 40px; border: 1px solid var(--border-color);">
+            <span class="close" onclick="closeModal('editProfileModal')">&times;</span>
+            <h2 style="margin-bottom: 25px; color: var(--text-primary); font-size: 28px;">Edit Profile</h2>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size:13px;">Full Name</label>
+                <input type="text" id="editName" class="linked-in-input">
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size:13px;">Role</label>
+                <select id="editRole" class="linked-in-input">
+                    <option value="owner">Problem Owner</option>
+                    <option value="developer">Developer</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size:13px;">Skills (comma separated)</label>
+                <input type="text" id="editSkills" placeholder="React, Python, Figma" class="linked-in-input">
+            </div>
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size:13px;">LinkedIn URL</label>
+                <input type="text" id="editLinkedin" class="linked-in-input">
+            </div>
+            <button class="btn-primary" style="width: 100%; padding: 16px; border-radius: 30px; font-weight: bold; letter-spacing: 1px;" onclick="saveProfile()">SAVE CHANGES</button>
+        </div>
+    </div>
+
+    <!-- Edit/View Idea Modal -->
+    <div class="modal" id="editIdeaModal">
+        <div class="modal-content" style="max-width: 600px; border-radius: 25px; padding: 40px; border: 1px solid var(--border-color);">
+            <span class="close" onclick="closeModal('editIdeaModal')">&times;</span>
+            <h2 id="editIdeaModalHeader" style="margin-bottom: 25px; color: var(--text-primary); font-size: 28px;">Edit Idea</h2>
+            
+            <input type="hidden" id="editIdeaId">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size:13px;">Idea Title</label>
+                <input type="text" id="editIdeaTitle" class="linked-in-input">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size:13px;">Describe the core problem...</label>
+                <textarea id="editIdeaDesc" class="linked-in-input" rows="6" style="border-radius: 12px; font-family: 'Inter', sans-serif; resize: vertical;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-top: 30px;" id="editIdeaActionBtns">
+                <button class="btn-outline" style="padding: 15px; border-radius: 30px; font-size: 14px; flex: 1; border-color: var(--text-secondary); color: var(--text-secondary); cursor: pointer; border-width: 1px; border-style: solid; font-weight: bold; letter-spacing: 1px;" onclick="saveEditedIdea('draft')">SAVE AS DRAFT</button>
+                <button class="btn-primary" style="padding: 15px; border-radius: 30px; font-size: 14px; flex: 1; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); color: white; cursor: pointer; border: none; font-weight: bold; letter-spacing: 1px;" onclick="saveEditedIdea('published')">PUBLISH SECURELY</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script>
         function toggleTheme() {
@@ -203,8 +247,219 @@
             document.querySelectorAll('.dash-view').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId + '-tab').style.display = 'block';
-            element.classList.add('active');
+            if(element) element.classList.add('active');
         }
+
+        function showDashToast(msg, type='success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.style.padding = '15px 25px';
+            toast.style.background = type === 'error' ? '#ff4757' : 'linear-gradient(135deg, var(--gradient-1), var(--gradient-2))';
+            toast.style.color = 'white';
+            toast.style.borderRadius = '8px';
+            toast.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
+            toast.style.fontWeight = '500';
+            toast.innerHTML = msg;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(()=>toast.remove(), 300); }, 3000);
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Fetch user data on load
+        let myIdeasCache = [];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('api/dashboard.php?action=overview')
+            .then(r => r.json())
+            .then(d => {
+                if(d.status === 'success' && d.data.profile) {
+                    const p = d.data.profile;
+                    
+                    // Populate Header
+                    document.getElementById('dashName').innerText = p.name || 'Unknown User';
+                    document.getElementById('dashAvatar').innerText = (p.name || 'U').substring(0, 2).toUpperCase();
+                    document.getElementById('dashRoleTitle').innerText = (p.role || 'USER').toUpperCase();
+                    
+                    if (p.email_verified == 1) {
+                        const b = document.getElementById('emailVerifyBadge');
+                        b.innerText = 'Email Verified';
+                        b.style.background = 'rgba(46, 213, 115, 0.1)';
+                        b.style.color = '#2ed573';
+                        b.style.borderColor = 'rgba(46, 213, 115, 0.3)';
+                        b.onclick = null;
+                        b.style.cursor = 'default';
+                    }
+                    
+                    if (p.linkedin_url) {
+                        const l = document.getElementById('dashLinkedin');
+                        l.href = p.linkedin_url;
+                        l.style.display = 'inline-block';
+                    } else {
+                        document.getElementById('dashLinkedin').style.display = 'none';
+                    }
+                    
+                    if (p.skills) {
+                        document.getElementById('dashSkills').innerHTML = p.skills.split(',').map(s => 
+                            `<span style="font-size: 11px; padding: 4px 12px; border: 1px solid var(--border-color); border-radius: 20px; color: var(--text-secondary);">${s.trim()}</span>`
+                        ).join('');
+                    } else {
+                        document.getElementById('dashSkills').innerHTML = '';
+                    }
+
+                    // Populate hidden default fields for modal
+                    document.getElementById('editName').value = p.name || '';
+                    document.getElementById('editRole').value = p.role || 'owner';
+                    document.getElementById('editSkills').value = p.skills || '';
+                    document.getElementById('editLinkedin').value = p.linkedin_url || '';
+                }
+            });
+        });
+
+        function openEditProfile() {
+            openModal('editProfileModal');
+        }
+
+        function saveProfile() {
+            const fd = new FormData();
+            fd.append('name', document.getElementById('editName').value);
+            fd.append('role', document.getElementById('editRole').value);
+            fd.append('skills', document.getElementById('editSkills').value);
+            fd.append('linkedin', document.getElementById('editLinkedin').value);
+
+            fetch('api/dashboard.php?action=update_profile', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(d => {
+                if(d.status === 'success') {
+                    showDashToast('Profile updated successfully!');
+                    closeModal('editProfileModal');
+                    setTimeout(() => location.reload(), 1000); // Reload to reflect changes elegantly
+                } else {
+                    showDashToast(d.message || 'Error updating profile', 'error');
+                }
+            });
+        }
+
+        function requestEmailVerification() {
+            showDashToast('Verification link sent via SendGrid API! (Stubbed for demo)');
+            // Wait visually then pseudo-verify
+            setTimeout(() => {
+                const b = document.getElementById('emailVerifyBadge');
+                b.innerText = 'Email Verified';
+                b.style.background = 'rgba(46, 213, 115, 0.1)';
+                b.style.color = '#2ed573';
+                b.style.borderColor = 'rgba(46, 213, 115, 0.3)';
+                b.onclick = null;
+                b.style.cursor = 'default';
+            }, 3000);
+        }
+
+        // New Idea Flows
+        function submitIdea(status) {
+            const title = document.getElementById('newIdeaTitle').value.trim();
+            const desc = document.getElementById('newIdeaDesc').value.trim();
+            const skills = document.getElementById('newIdeaSkills').value.trim();
+
+            if (!title || !desc) {
+                showDashToast("Title and Description are required", "error");
+                return;
+            }
+
+            const fd = new FormData();
+            fd.append('title', title);
+            fd.append('description', desc);
+            fd.append('skills', skills);
+            fd.append('status', status);
+
+            fetch('api/problems.php?action=create', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(d => {
+                if(d.status === 'success') {
+                    showDashToast(d.message);
+                    document.getElementById('newIdeaTitle').value = '';
+                    document.getElementById('newIdeaDesc').value = '';
+                    document.getElementById('newIdeaSkills').value = '';
+                    setTimeout(() => location.reload(), 1500); // refresh list
+                } else {
+                    showDashToast(d.message, 'error');
+                }
+            });
+        }
+
+        function loadMyIdeas() {
+            fetch('api/dashboard.php?action=my_ideas')
+            .then(r => r.json())
+            .then(d => {
+                const c = document.getElementById('myPostedIdeasContainer');
+                if (d.status === 'success') {
+                    myIdeasCache = d.data;
+                    if(myIdeasCache.length === 0) {
+                        c.innerHTML = '<div style="color:var(--text-secondary);">No ideas posted yet.</div>';
+                        return;
+                    }
+                    c.innerHTML = myIdeasCache.map(idea => {
+                        const isDraft = idea.status === 'draft';
+                        const badgeStyle = isDraft ? 
+                            'background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); border: 1px solid var(--border-color);' : 
+                            'background: rgba(20, 184, 166, 0.1); color: #14B8A6;';
+                        const clickAction = isDraft ? `onclick="openEditIdea(${idea.id})"` : '';
+                        const cursorStyle = isDraft ? 'cursor:pointer;' : '';
+                        
+                        return `<div style="background: var(--card-bg); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; transition: 0.3s; ${cursorStyle}" onmouseover="this.style.borderColor='var(--gradient-1)'" onmouseout="this.style.borderColor='var(--border-color)'" ${clickAction}>
+                            <div>
+                                <h4 style="color: var(--text-primary); font-size: 18px;">${idea.title}</h4>
+                                <p style="color:var(--text-secondary); font-size:13px; margin-top:8px;">${isDraft ? '(Click to Edit)' : 'Views: '+idea.views}</p>
+                            </div>
+                            <span style="padding: 6px 16px; border-radius: 30px; font-size: 12px; font-weight: 600; ${badgeStyle}">${idea.status.toUpperCase()}</span>
+                        </div>`;
+                    }).join('');
+                }
+            });
+        }
+
+        function openEditIdea(id) {
+            const idea = myIdeasCache.find(i => i.id == id);
+            if(!idea) return;
+            document.getElementById('editIdeaId').value = idea.id;
+            document.getElementById('editIdeaTitle').value = idea.title;
+            document.getElementById('editIdeaDesc').value = idea.description;
+            
+            // Only drafts are editable, once pubbed it stays pubbed.
+            openModal('editIdeaModal');
+        }
+
+        function saveEditedIdea(targetStatus) {
+            const id = document.getElementById('editIdeaId').value;
+            const title = document.getElementById('editIdeaTitle').value.trim();
+            const desc = document.getElementById('editIdeaDesc').value.trim();
+            
+            if (!title || !desc) {
+                showDashToast("Title and Description are required", "error");
+                return;
+            }
+
+            const fd = new FormData();
+            fd.append('problem_id', id);
+            fd.append('title', title);
+            fd.append('description', desc);
+            fd.append('status', targetStatus);
+
+            fetch('api/problems.php?action=update_idea', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(d => {
+                if(d.status === 'success') {
+                    showDashToast(d.message);
+                    closeModal('editIdeaModal');
+                    loadMyIdeas(); // reload ideas inline
+                } else {
+                    showDashToast(d.message, 'error');
+                }
+            });
+        }
+
+        // Initialize ideas list
+        document.addEventListener('DOMContentLoaded', loadMyIdeas);
     </script>
 </body>
 </html>

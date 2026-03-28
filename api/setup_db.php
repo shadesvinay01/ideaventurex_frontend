@@ -15,6 +15,7 @@ try {
         oauth_provider VARCHAR(50) NULL,
         oauth_uid VARCHAR(100) NULL,
         otp_code VARCHAR(10) NULL,
+        email_verified BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
@@ -28,6 +29,7 @@ try {
         description TEXT,
         views INT DEFAULT 0,
         locked BOOLEAN DEFAULT TRUE,
+        status VARCHAR(20) DEFAULT 'published',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     )");

@@ -358,6 +358,20 @@
     </div>
 
     <!-- Modals -->
+    <!-- Story Modal -->
+    <div class="modal" id="storyModal">
+        <div class="modal-content" style="max-width: 700px; border-radius: 20px; padding: 40px;">
+            <span class="close" onclick="closeModal('storyModal')">&times;</span>
+            <div id="storyModalContent">
+                <h2 id="storyModalTitle" style="font-size:32px; margin-bottom: 20px; line-height:1.2; color: var(--text-primary);">Story Title</h2>
+                <div style="width: 100%; height: 200px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-3)); border-radius: 12px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;"><i class="fas fa-book-open"></i></div>
+                <div id="storyModalBody" style="color: var(--text-secondary); line-height: 1.8; font-size: 16px;">
+                    Story content goes here...
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Auth Modal (Unified Login/Signup) -->
     <div class="modal" id="authModal">
         <div class="modal-content auth-container">
@@ -480,6 +494,18 @@
                 <button class="btn-primary auth-submit" onclick="showToast('RESET LINK SENT')">SEND RESET LINK</button>
                 <p class="auth-switch-text">
                     Back to <a href="#" onclick="toggleAuthView('login')">Sign In</a>
+                </p>
+            </div>
+
+            <div id="verifyEmailView" style="display: none; text-align: center; padding: 20px 0;">
+                <div class="auth-header">
+                    <div style="width: 80px; height: 80px; background: rgba(46, 213, 115, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: #2ed573; font-size: 32px;"><i class="fas fa-envelope-open-text"></i></div>
+                    <h2>Verify Your Email</h2>
+                    <p style="margin-top: 10px; color: var(--text-secondary); line-height: 1.6;">We've sent a verification link to your inbox. Please verify to fully activate your IdeaventureX account.</p>
+                </div>
+                <button class="btn-primary auth-submit" style="margin-top: 20px;" onclick="closeModal('authModal')">I UNDERSTAND</button>
+                <p class="auth-switch-text" style="margin-top: 20px;">
+                    Didn't receive it? <a href="#" onclick="showToast('Verification email resent!')">Resend email</a>
                 </p>
             </div>
         </div>

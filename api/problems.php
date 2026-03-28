@@ -70,12 +70,37 @@ elseif ($action === 'create') {
     }
     
     $intent = "CO-FOUNDER"; // Default
+    $status = $_POST['status'] ?? 'published';
     
-    $stmt = $conn->prepare("INSERT INTO problems (user_id, category, intent, title, description, views, locked) VALUES (?, ?, ?, ?, ?, 0, 1)");
-    if ($stmt->execute([$_SESSION['user_id'], $category, $intent, $title, $description])) {
-        echo json_encode(["status" => "success", "message" => "Idea published securely."]);
+    $stmt = $conn->prepare("INSERT INTO problems (user_id, category, intent, title, description, views, locked, status) VALUES (?, ?, ?, ?, ?, 0, 1, ?)");
+    if ($stmt->execute([$_SESSION['user_id'], $category, $intent, $title, $description, $status])) {
+        $msg = $status === 'draft' ? "Idea saved as draft." : "Idea published securely.";
+        echo json_encode(["status" => "success", "message" => $msg]);
     } else {
         echo json_encode(["status" => "error", "message" => "Failed to post."]);
+    }
+}
+
+elseif ($action === 'update_idea') {
+    if (!$isLoggedIn) {
+        die(json_encode(["status" => "error", "message" => "Unauthorized. Please login."]));
+    }
+    
+    $problem_id = $_POST['problem_id'] ?? '';
+    $title = $_POST['title'] ?? '';
+    $description = $_POST['description'] ?? '';
+    $status = $_POST['status'] ?? 'draft';
+    
+    if (empty($problem_id) || empty($title) || empty($description)) {
+        die(json_encode(["status" => "error", "message" => "Missing required fields."]));
+    }
+    
+    $stmt = $conn->prepare("UPDATE problems SET title=?, description=?, status=? WHERE id=? AND user_id=?");
+    if ($stmt->execute([$title, $description, $status, $problem_id, $_SESSION['user_id']])) {
+        $msg = $status === 'draft' ? "Draft updated successfully." : "Idea published securely.";
+        echo json_encode(["status" => "success", "message" => $msg]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Failed to update idea."]);
     }
 }
 ?>

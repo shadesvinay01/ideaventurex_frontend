@@ -188,8 +188,25 @@ function createProblemCard(p) {
 function loadStories() {
     const storiesGrid = document.getElementById('storiesGrid');
     if (storiesGrid) {
-        storiesGrid.innerHTML = stories.map(s => `<div class="problem-card"><h3 style="font-size:20px; margin-bottom:15px;">${s.title}</h3><p style="color:var(--text-secondary); margin-bottom:20px;">${s.desc}</p><button class="interest-btn" onclick="showToast('READING STORY')">READ STORY</button></div>`).join('');
+        storiesGrid.innerHTML = stories.map((s, index) => `<div class="problem-card"><h3 style="font-size:20px; margin-bottom:15px;">${s.title}</h3><p style="color:var(--text-secondary); margin-bottom:20px;">${s.desc}</p><button class="interest-btn" onclick="openStoryModal(${index})">READ STORY</button></div>`).join('');
     }
+}
+
+function openStoryModal(index) {
+    const story = stories[index];
+    if(!story) return;
+    document.getElementById('storyModalTitle').textContent = story.title;
+    
+    // Create a mock expanded blog body based on the desc
+    const expandedBody = `
+        <p style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px;">${story.desc}</p>
+        <p style="margin-bottom: 20px;">This is a detailed look into how the founders navigated through the initial challenges and built a scalable venture using the IdeaventureX network. By posting their problem securely, they connected with the right engineering talent and achieved rapid iteration.</p>
+        <p style="margin-bottom: 20px;">The initial spark came from identifying a massive gap in the market. Local solutions were disjointed, and the founding team lacked the technical depth to bridge that gap alone.</p>
+        <p>Today, the platform serves millions, proving that verifying intent and securing IP leads to successful execution.</p>
+    `;
+    
+    document.getElementById('storyModalBody').innerHTML = expandedBody;
+    openModal('storyModal');
 }
 
 function loadPricing() {
@@ -407,7 +424,7 @@ function openAuthModal(view = 'login') {
 }
 
 function toggleAuthView(view) {
-    const views = ['login', 'signup', 'forgot'];
+    const views = ['login', 'signup', 'forgot', 'verifyEmail'];
     views.forEach(v => {
         const el = document.getElementById(v + 'View');
         if (el) el.style.display = 'none';
@@ -448,14 +465,24 @@ function detectInputType(input, iconId, mode) {
 
 function demoLogin() {
     const inputVal = document.getElementById('loginEmail').value.trim();
-    const isPhone = /^[\d+\-\s()]+$/.test(inputVal) && inputVal.replace(/\D/g, '').length >= 7;
+    if (!inputVal) return showToast('Please enter Email or Phone');
     
-    const pass = isPhone ? document.getElementById('loginOtpInput').value : document.getElementById('loginPassword').value;
+    const isPhone = /^[\d+\-\s()]+$/.test(inputVal) && inputVal.replace(/\D/g, '').length >= 7;
     
     const fd = new FormData();
     fd.append('action', 'login');
-    fd.append('email', inputVal); // Use inputVal as the identifier, backend handles
-    fd.append('password', pass);
+    
+    if (isPhone) {
+        const otp = document.getElementById('loginOtpInput').value.trim();
+        if (!otp) return showToast('Please enter your OTP');
+        fd.append('phone', inputVal);
+        fd.append('otp', otp);
+    } else {
+        const pass = document.getElementById('loginPassword').value;
+        if (!pass) return showToast('Please enter your Password');
+        fd.append('email', inputVal);
+        fd.append('password', pass);
+    }
     
     fetch('api/auth.php', {method: 'POST', body: fd})
     .then(r => r.json())
@@ -475,36 +502,48 @@ function demoLogin() {
 }
 
 function demoSignup() {
-    const name = document.getElementById('signupName').value;
+    const name = document.getElementById('signupName').value.trim();
     const inputVal = document.getElementById('signupEmail').value.trim();
+    if (!inputVal || !name) return showToast('Please fill all required fields');
     
     const isPhone = /^[\d+\-\s()]+$/.test(inputVal) && inputVal.replace(/\D/g, '').length >= 7;
-    
-    const email = isPhone ? '' : inputVal;
-    const phone = isPhone ? inputVal : '';
-    const pass = isPhone ? document.getElementById('signupOtpInput').value : document.getElementById('signupPassword').value;
-    
     const role = document.getElementById('signupRole').value;
     
     const fd = new FormData();
     fd.append('action', 'register');
     fd.append('name', name);
-    fd.append('email', email);
-    fd.append('password', pass);
     fd.append('role', role);
-    fd.append('phone', phone);
 
+    if (isPhone) {
+        const otp = document.getElementById('signupOtpInput').value.trim();
+        if (!otp) return showToast('Please enter the OTP sent to your phone');
+        fd.append('phone', inputVal);
+        fd.append('otp', otp);
+    } else {
+        const pass = document.getElementById('signupPassword').value;
+        if (!pass) return showToast('Please choose a password');
+        fd.append('email', inputVal);
+        fd.append('password', pass);
+    }
+    
     fetch('api/auth.php', {method: 'POST', body: fd})
     .then(r => r.json())
     .then(d => {
         if(d.status === 'success') {
-            closeModal('authModal');
             document.getElementById('authButtons').style.display = 'none';
             document.getElementById('profileBadge').style.display = 'flex';
-            document.getElementById('profileType').textContent = d.role.toUpperCase();
+            document.getElementById('profileType').textContent = d.role ? d.role.toUpperCase() : role.toUpperCase();
             isLoggedIn = true;
-            showToast('ACCOUNT CREATED!');
             loadProblems();
+            
+            if (!isPhone) {
+                // Strict email verification redirect
+                toggleAuthView('verifyEmail');
+                showToast('ACCOUNT CREATED!');
+            } else {
+                closeModal('authModal');
+                showToast('ACCOUNT CREATED & VERIFIED!');
+            }
         } else {
             showToast(d.message);
         }

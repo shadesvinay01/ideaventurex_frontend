@@ -10,36 +10,60 @@ if ($action === 'register') {
     $email = $_POST['email'] ?? '';
     $phone = $_POST['phone'] ?? null;
     $password = $_POST['password'] ?? '';
+    $otp = $_POST['otp'] ?? '';
     $role = $_POST['role'] ?? 'owner';
     
-    if (empty($name) || empty($email) || empty($password)) {
-        die(json_encode(["status" => "error", "message" => "All fields required"]));
+    if (empty($name)) {
+        die(json_encode(["status" => "error", "message" => "Name is required"]));
     }
     
-    // Check if email exists
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    if ($stmt->rowCount() > 0) {
-        die(json_encode(["status" => "error", "message" => "Email already registered"]));
+    $email_verified = 0;
+    
+    // Role mapping
+    $role_val = 'owner';
+    if(stripos($role, 'DEVELOPER') !== false || stripos($role, 'ADVISOR') !== false) {
+        $role_val = 'developer';
+    }
+    
+    if (!empty($phone)) {
+        // STRICT PHONE VALIDATION
+        if (empty($otp)) {
+            die(json_encode(["status" => "error", "message" => "OTP is required for phone registration."]));
+        }
+        if (!isset($_SESSION['auth_otp']) || $_SESSION['auth_phone'] !== $phone || (string)$_SESSION['auth_otp'] !== (string)$otp) {
+            die(json_encode(["status" => "error", "message" => "Invalid or expired OTP."]));
+        }
+        
+        $stmt = $conn->prepare("SELECT id FROM users WHERE phone = ?");
+        $stmt->execute([$phone]);
+        if ($stmt->rowCount() > 0) die(json_encode(["status" => "error", "message" => "Phone number already registered."]));
+
+        $email = $phone . "@phone-user.local"; // Dummy email to bypass DB NOT NULL
+        $password = bin2hex(random_bytes(10));
+        $email_verified = 1; // Phone is verified
+        unset($_SESSION['auth_otp']);
+    } else {
+        // STRICT EMAIL VALIDATION
+        if (empty($email) || empty($password)) {
+            die(json_encode(["status" => "error", "message" => "Email and Password required."]));
+        }
+        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        if ($stmt->rowCount() > 0) die(json_encode(["status" => "error", "message" => "Email already registered."]));
     }
     
     $hash = password_hash($password, PASSWORD_DEFAULT);
     
-    // Default role mapping logic
-    $role_val = 'owner';
-    if(stripos($role, 'DEVELOPER') !== false) {
-        $role_val = 'developer';
-    } else if (stripos($role, 'ADVISOR') !== false) {
-        $role_val = 'developer'; // Keeping simple
-    }
-    
-    $stmt = $conn->prepare("INSERT INTO users (name, email, phone, password_hash, role) VALUES (?, ?, ?, ?, ?)");
-    if ($stmt->execute([$name, $email, $phone, $hash, $role_val])) {
-        // Auto-login
-        $_SESSION['user_id'] = $conn->lastInsertId();
-        $_SESSION['user_name'] = $name;
-        $_SESSION['user_role'] = $role_val;
-        $_SESSION['user_email'] = $email;
+    $stmt = $conn->prepare("INSERT INTO users (name, email, phone, password_hash, role, email_verified) VALUES (?, ?, ?, ?, ?, ?)");
+    if ($stmt->execute([$name, $email, $phone, $hash, $role_val, $email_verified])) {
+        if (!empty($phone)) {
+            // Auto login ONLY For phone
+            $_SESSION['user_id'] = $conn->lastInsertId();
+            $_SESSION['user_name'] = $name;
+            $_SESSION['user_role'] = $role_val;
+            $_SESSION['user_email'] = $email;
+        }
+        // Email users do NOT get auto-login session set, causing them to be forced to Verify.
         $response = ["status" => "success", "message" => "Account created successfully", "role" => $role_val, "name" => $name];
     } else {
         $response = ["status" => "error", "message" => "Failed to create account"];
@@ -48,13 +72,36 @@ if ($action === 'register') {
 
 elseif ($action === 'login') {
     $email = $_POST['email'] ?? '';
+    $phone = $_POST['phone'] ?? '';
     $password = $_POST['password'] ?? '';
+    $otp = $_POST['otp'] ?? '';
     
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!empty($phone)) {
+        // Phone Login
+        if (empty($otp)) die(json_encode(["status" => "error", "message" => "OTP is required"]));
+        if (!isset($_SESSION['auth_otp']) || $_SESSION['auth_phone'] !== $phone || (string)$_SESSION['auth_otp'] !== (string)$otp) {
+            die(json_encode(["status" => "error", "message" => "Invalid or expired OTP"]));
+        }
+        $stmt = $conn->prepare("SELECT * FROM users WHERE phone = ?");
+        $stmt->execute([$phone]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($user) {
+            unset($_SESSION['auth_otp']); // Clear it
+            $valid = true;
+        } else {
+            $valid = false;
+        }
+    } else {
+        // Email Login
+        if (empty($email) || empty($password)) die(json_encode(["status" => "error", "message" => "Email and Password required"]));
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $valid = $user && password_verify($password, $user['password_hash']);
+    }
     
-    if ($user && password_verify($password, $user['password_hash'])) {
+    if ($valid && $user) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $user['role'];
@@ -62,7 +109,7 @@ elseif ($action === 'login') {
         
         $response = ["status" => "success", "message" => "Login successful", "role" => $user['role'], "name" => $user['name']];
     } else {
-        $response = ["status" => "error", "message" => "Invalid email or password"];
+        $response = ["status" => "error", "message" => "Invalid credentials or account does not exist"];
     }
 }
 
@@ -88,51 +135,19 @@ elseif ($action === 'check_session') {
     }
 }
 
-/* 
- * --- STUBS FOR ADVANCED AUTHENTICATION (OTP & OAuth) ---
- */
-
 elseif ($action === 'send_otp') {
     $phone = $_POST['phone'] ?? '';
     if(!empty($phone)) {
-        // Generate random 6-digit OTP
         $otp = rand(100000, 999999);
         
-        // Save to User's DB record if they exist (or a temp table if during signup)
-        // $stmt = $conn->prepare("UPDATE users SET otp_code = ? WHERE phone = ?");
-        // $stmt->execute([$otp, $phone]);
+        // Use PHP Session to hold the temporal OTP securely
+        $_SESSION['auth_otp'] = $otp;
+        $_SESSION['auth_phone'] = $phone;
         
-        // Here you would use Twilio, MessageBird, or AWS SNS to dispatch the SMS OTP.
-        // For local development stub, we'll just return success.
-        error_log("OTP for $phone is $otp"); // Logs to PHP error log
-        
-        $response = ["status" => "success", "message" => "OTP dispatched via SMS to $phone"];
+        // Simulating external SMS API response
+        $response = ["status" => "success", "message" => "OTP sent! (Demo OTP: $otp)"];
     } else {
         $response = ["status" => "error", "message" => "Phone number missing"];
-    }
-}
-
-elseif ($action === 'verify_otp') {
-    $email = $_POST['email'] ?? '';
-    $otp = $_POST['otp'] ?? '';
-    
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? AND otp_code = ?");
-    $stmt->execute([$email, $otp]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($user) {
-        // Clear OTP
-        $conn->prepare("UPDATE users SET otp_code = NULL WHERE id = ?")->execute([$user['id']]);
-        
-        // Login user
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_name'] = $user['name'];
-        $_SESSION['user_role'] = $user['role'];
-        $_SESSION['user_email'] = $user['email'];
-        
-        $response = ["status" => "success", "message" => "OTP Verified", "role" => $user['role']];
-    } else {
-        $response = ["status" => "error", "message" => "Invalid or expired OTP"];
     }
 }
 
