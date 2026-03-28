@@ -109,8 +109,12 @@ function checkSession() {
             
             // Update Avatar Badge
             const avatarEl = document.getElementById('profileAvatar');
-            if (data.user.avatar) {
-                avatarEl.innerHTML = data.user.avatar;
+            const avatarKey = data.user.avatar;
+            if (avatarKey && avatarKey.startsWith('m') || avatarKey && avatarKey.startsWith('f')) {
+                avatarEl.innerHTML = getAvatarEmoji(avatarKey);
+                avatarEl.style.fontSize = '20px';
+            } else if (data.user.avatar) {
+                avatarEl.innerHTML = data.user.avatar; // legacy emoji support
                 avatarEl.style.fontSize = '20px';
             } else {
                 avatarEl.textContent = (data.user.name || 'U').substring(0, 2).toUpperCase();
@@ -121,6 +125,14 @@ function checkSession() {
             updateSubscribeButtons();
         }
     });
+}
+
+function getAvatarEmoji(key) {
+    const mapping = {
+        'm1': '👨', 'm2': '🧑', 'm3': '👨‍💼', 'm4': '👨‍💻', 'm5': '🧔',
+        'f1': '👩', 'f2': '👩‍💼', 'f3': '👩‍💻', 'f4': '🧕', 'f5': '💁‍♀️'
+    };
+    return mapping[key] || '👤';
 }
 
 function updateSubscribeButtons() {
@@ -655,7 +667,11 @@ function demoLogin() {
             
             // Update Avatar Badge
             const avatarEl = document.getElementById('profileAvatar');
-            if (d.avatar) {
+            const avatarKey = d.avatar;
+            if (avatarKey && (avatarKey.startsWith('m') || avatarKey.startsWith('f'))) {
+                avatarEl.innerHTML = getAvatarEmoji(avatarKey);
+                avatarEl.style.fontSize = '20px';
+            } else if (d.avatar) {
                 avatarEl.innerHTML = d.avatar;
                 avatarEl.style.fontSize = '20px';
             } else {

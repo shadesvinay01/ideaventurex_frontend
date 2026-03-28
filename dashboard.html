@@ -60,6 +60,8 @@
             .dashboard-layout { flex-direction: column; }
             .dashboard-sidebar { width: 100%; height: auto; position: static; padding: 20px; border-bottom: 1px solid var(--border-color); border-right: none;}
             .dashboard-content { margin-left: 0; padding: 20px; }
+            .profile-header { padding: 25px !important; gap: 20px !important; }
+            .profile-avatar-large { width: 90px !important; height: 90px !important; min-width: 90px !important; font-size: 45px !important; }
         }
         .avatar-opt {
             font-size: 30px;
@@ -109,13 +111,13 @@
 
             <div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px;"></div>
             <div class="profile-header" style="background: var(--card-bg); border-radius: 20px; padding: 40px; border: 1px solid var(--border-color); display: flex; flex-wrap: wrap; align-items: center; gap: 30px; margin-bottom: 30px; position:relative; overflow:hidden;">
-                <div id="dashAvatar" class="profile-avatar-large" style="width: 100px; height: 100px; min-width: 100px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: white;">--</div>
+                <div id="dashAvatar" class="profile-avatar-large" style="width: 120px; height: 120px; min-width: 120px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: bold; color: white; transition: 0.3s;">--</div>
                 <div class="profile-info" style="flex: 1; z-index:1; min-width: 250px;">
                     <div style="display:flex; align-items:center; gap: 15px; margin-bottom: 5px;">
                         <h2 id="dashName" style="font-size: 32px; color: var(--text-primary);">Loading...</h2>
                         <span id="emailVerifyBadge" style="font-size: 11px; padding: 4px 12px; border-radius: 20px; background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.3); cursor: pointer;" onclick="requestEmailVerification()">Email Not Verified [Verify]</span>
                     </div>
-                    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;"><span id="dashRoleTitle">USER</span> · VERIFIED <i class="fas fa-check-circle" style="color:var(--gradient-1);"></i></p>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;"><span id="dashRoleTitle">USER</span> <span id="dashVerifiedTag" style="display:none;"> · VERIFIED <i class="fas fa-check-circle" style="color:var(--gradient-1);"></i></span></p>
                     <div id="dashSkills" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;"></div>
                 </div>
                 <div style="text-align: right; min-width: 200px;">
@@ -297,6 +299,14 @@
             setTimeout(() => { toast.style.opacity = '0'; setTimeout(()=>toast.remove(), 300); }, 3000);
         }
 
+        function getAvatarEmoji(key) {
+            const mapping = {
+                'm1': '👨', 'm2': '🧑', 'm3': '👨‍💼', 'm4': '👨‍💻', 'm5': '🧔',
+                'f1': '👩', 'f2': '👩‍💼', 'f3': '👩‍💻', 'f4': '🧕', 'f5': '💁‍♀️'
+            };
+            return mapping[key] || '👤';
+        }
+
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -311,20 +321,27 @@
                     const p = d.data.profile;
                     
                     // Populate Header
-                    document.getElementById('dashName').innerText = p.name || 'Unknown User';
-                    document.getElementById('dashAvatar').innerText = (p.name || 'U').substring(0, 2).toUpperCase();
-                    document.getElementById('dashRoleTitle').innerText = (p.role || 'USER').toUpperCase();
+                    document.getElementById('dashName').textContent = p.name || 'User';
+                    const isVerified = p.email_verified == 1 || p.is_oauth == 1;
+                    document.getElementById('dashVerifiedTag').style.display = isVerified ? 'inline' : 'none';
+                    document.getElementById('emailVerifyBadge').style.display = isVerified ? 'none' : 'inline-block';
                     
-                    if (p.email_verified == 1) {
-                        const b = document.getElementById('emailVerifyBadge');
-                        b.innerText = 'Email Verified';
-                        b.style.background = 'rgba(46, 213, 115, 0.1)';
-                        b.style.color = '#2ed573';
-                        b.style.borderColor = 'rgba(46, 213, 115, 0.3)';
-                        b.onclick = null;
-                        b.style.cursor = 'default';
+                    document.getElementById('dashRoleTitle').textContent = p.role ? p.role.toUpperCase() : 'USER';
+                    
+                    const avatarEl = document.getElementById('dashAvatar');
+                    const avatarKey = p.avatar;
+                    const isEmojiKey = avatarKey && (avatarKey.startsWith('m') || avatarKey.startsWith('f'));
+                    if (isEmojiKey) {
+                        avatarEl.innerHTML = getAvatarEmoji(avatarKey);
+                        avatarEl.style.fontSize = '60px'; // fill more circle
+                    } else if (p.avatar) {
+                        avatarEl.innerHTML = p.avatar; // raw emoji
+                        avatarEl.style.fontSize = '60px';
+                    } else {
+                        avatarEl.textContent = (p.name || 'U').substring(0, 2).toUpperCase();
+                        avatarEl.style.fontSize = '36px';
                     }
-                    
+
                     if (p.linkedin_url) {
                         const l = document.getElementById('dashLinkedin');
                         l.href = p.linkedin_url;
@@ -351,13 +368,6 @@
                     if (p.avatar) {
                         document.getElementById('editAvatar').value = p.avatar;
                         selectAvatar(p.avatar, false); // highlight selected
-                    }
-                    
-                    // Update dashboard avatar display
-                    if (p.avatar) {
-                        const avatarEmojis = {m1:'👨',m2:'🧑',m3:'👨‍💼',m4:'👨‍💻',m5:'🧔',f1:'👩',f2:'👩‍💼',f3:'👩‍💻',f4:'🧕',f5:'💁‍♀️'};
-                        document.getElementById('dashAvatar').innerHTML = avatarEmojis[p.avatar] || (p.name||'U').substring(0,2).toUpperCase();
-                        document.getElementById('dashAvatar').style.fontSize = '36px';
                     }
                 }
                 
