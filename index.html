@@ -99,7 +99,6 @@
             <a onclick="switchPage('explore')">EXPLORE</a>
             <a onclick="switchPage('stories')">STORIES</a>
             <a onclick="switchPage('advertise')">ADVERTISE</a>
-            <a onclick="switchPage('admin')">ADMIN</a>
         </div>
         <div class="nav-right">
             <div class="theme-toggle" onclick="toggleTheme()">
@@ -128,8 +127,7 @@
         <a style="display: block; padding: 15px; color: var(--text-primary); text-decoration: none; border-bottom: 1px solid var(--border-color);" onclick="switchPage('home'); toggleMobileMenu()">HOME</a>
         <a style="display: block; padding: 15px; color: var(--text-primary); text-decoration: none; border-bottom: 1px solid var(--border-color);" onclick="switchPage('explore'); toggleMobileMenu()">EXPLORE</a>
         <a style="display: block; padding: 15px; color: var(--text-primary); text-decoration: none; border-bottom: 1px solid var(--border-color);" onclick="switchPage('stories'); toggleMobileMenu()">STORIES</a>
-        <a style="display: block; padding: 15px; color: var(--text-primary); text-decoration: none; border-bottom: 1px solid var(--border-color);" onclick="switchPage('advertise'); toggleMobileMenu()">ADVERTISE</a>
-        <a style="display: block; padding: 15px; color: var(--text-primary); text-decoration: none;" onclick="switchPage('admin'); toggleMobileMenu()">ADMIN</a>
+        <a style="display: block; padding: 15px; color: var(--text-primary); text-decoration: none;" onclick="switchPage('advertise'); toggleMobileMenu()">ADVERTISE</a>
     </div>
 
     <!-- MAIN CONTENT -->
@@ -290,67 +288,6 @@
         </div>
 
         <!-- DASHBOARD MOVED TO dashbaord.html -->
-
-        <!-- ADMIN PAGE -->
-        <div id="admin-page" class="page">
-            <div id="adminLoginBox" class="admin-login-box">
-                <h2>ADMIN ACCESS</h2>
-                <input type="email" placeholder="admin@ideaventurex.com" value="admin@ideaventurex.com" id="adminEmail">
-                <input type="password" placeholder="••••••••" value="admin123" id="adminPassword">
-                <button class="btn-primary" onclick="adminLogin()">ACCESS DASHBOARD</button>
-            </div>
-            <div id="adminPanel" class="admin-panel">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-                    <h2 style="font-size:36px;">ADMIN INTELLIGENCE</h2>
-                    <div class="profile-badge" style="display:flex; position:relative;" id="adminProfileBadge">
-                        <div class="avatar">AD</div>
-                        <span>ADMIN</span>
-                        <div class="logout-dropdown" id="adminLogoutDropdown">
-                            <a onclick="logout(); closeAdminDropdown();">🚪 LOGOUT</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="admin-stats">
-                    <div class="stat-card-large"><h3>47</h3><p>LIVE PROBLEMS</p></div>
-                    <div class="stat-card-large"><h3>238</h3><p>DEVELOPERS</p></div>
-                    <div class="stat-card-large"><h3>15</h3><p>MATCHES</p></div>
-                    <div class="stat-card-large"><h3>89</h3><p>WEEKLY ACTIVE</p></div>
-                </div>
-
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                    <div class="admin-section">
-                        <h3>⏳ PENDING VERIFICATION</h3>
-                        <div class="queue-item"><span>AI DIAGNOSTIC TOOL</span> <button class="verify-btn" onclick="showToast('VERIFIED')">VERIFY</button></div>
-                        <div class="queue-item"><span>ELDERLY CARE IOT</span> <button class="verify-btn" onclick="showToast('VERIFIED')">VERIFY</button></div>
-                        <div class="queue-item"><span>FARMER MARKETPLACE</span> <button class="verify-btn" onclick="showToast('VERIFIED')">VERIFY</button></div>
-                    </div>
-                    <div class="admin-section">
-                        <h3>🔥 TRENDING SECTORS</h3>
-                        <div class="trend-item"><span>TECH</span> <span>42%</span></div>
-                        <div class="trend-item"><span>HEALTH</span> <span>28%</span></div>
-                        <div class="trend-item"><span>FINTECH</span> <span>18%</span></div>
-                        <div class="trend-item"><span>EDU</span> <span>8%</span></div>
-                        <div class="trend-item"><span>AGRI</span> <span>4%</span></div>
-                    </div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>👁️ ACCESS LOG</h3>
-                    <div class="log-item">PRIYA S. viewed AI DIAGNOSTIC · 2 min ago</div>
-                    <div class="log-item">RAHUL K. unlocked TELEMEDICINE · 15 min ago</div>
-                    <div class="log-item">ANAND M. posted new problem · 1 hour ago</div>
-                    <div class="log-item">SUNITA P. matched with developer · 3 hours ago</div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>🤝 MATCH QUEUE</h3>
-                    <div class="queue-item"><span>AI TOOL · Developer: PRIYA S.</span> <span style="color:var(--gradient-1);">PENDING</span></div>
-                    <div class="queue-item"><span>TELEMEDICINE · Developer: RAHUL K.</span> <span style="color:var(--gradient-3);">ACCEPTED</span></div>
-                    <div class="queue-item"><span>MICRO-CREDIT · Developer: ANAND M.</span> <span style="color:var(--gradient-2);">IN REVIEW</span></div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- FOOTER -->
@@ -421,33 +358,122 @@
     </div>
 
     <!-- Modals -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('loginModal')">&times;</span>
-            <h2>SIGN IN</h2>
-            <input type="email" placeholder="EMAIL" id="loginEmail">
-            <input type="password" placeholder="PASSWORD" id="loginPassword">
-            <button class="btn-primary" style="width:100%;" onclick="demoLogin()">SIGN IN</button>
-        </div>
-    </div>
-    
-    <div class="modal" id="signupModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('signupModal')">&times;</span>
-            <h2>JOIN IDEAVENTUREX</h2>
-            <input type="text" placeholder="FULL NAME" id="signupName">
-            <input type="email" placeholder="EMAIL" id="signupEmail">
-            <input type="password" placeholder="PASSWORD" id="signupPassword">
-            <select id="signupRole">
-                <option>PROBLEM OWNER</option>
-                <option>DEVELOPER</option>
-                <option>ADVISOR</option>
-            </select>
-            <div class="otp-row">
-                <input type="text" placeholder="OTP" id="otpInput">
-                <button class="btn-outline" onclick="showToast('OTP SENT')">SEND</button>
+    <!-- Auth Modal (Unified Login/Signup) -->
+    <div class="modal" id="authModal">
+        <div class="modal-content auth-container">
+            <span class="close" onclick="closeModal('authModal')">&times;</span>
+            <div id="loginView">
+                <div class="auth-header">
+                    <h2>Welcome Back</h2>
+                    <p>Enter your credentials to access your account</p>
+                </div>
+                <div class="social-auth">
+                    <button class="social-btn google" onclick="showToast('GOOGLE LOGIN - STUB')">
+                        <i class="fab fa-google"></i> Sign in with Google
+                    </button>
+                    <button class="social-btn apple" id="appleBtn" onclick="showToast('APPLE LOGIN - STUB')">
+                        <i class="fab fa-apple"></i> Sign in with Apple
+                    </button>
+                </div>
+                <div class="divider"><span>OR CONTINUE WITH EMAIL</span></div>
+                
+                <div class="form-group input-icon-wrapper">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" placeholder="Email Address" id="loginEmail" class="premium-input">
+                </div>
+                <div class="form-group input-icon-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" placeholder="Password" id="loginPassword" class="premium-input">
+                </div>
+                
+                <div style="text-align: right; margin-bottom: 24px;">
+                    <a href="#" class="forgot-link" onclick="toggleAuthView('forgot')">Forgot Password?</a>
+                </div>
+                <button class="btn-primary auth-submit" onclick="demoLogin()">SIGN IN</button>
+                <p class="auth-switch-text">
+                    Don't have an account? <a href="#" onclick="toggleAuthView('signup')">Join now</a>
+                </p>
             </div>
-            <button class="btn-primary" style="width:100%; margin-top:20px;" onclick="demoSignup()">CREATE ACCOUNT</button>
+
+            <div id="signupView" style="display: none;">
+                <div class="auth-header">
+                    <h2>Join IdeaventureX</h2>
+                    <p>Create an account to connect & innovate</p>
+                </div>
+                <div class="social-auth">
+                    <button class="social-btn google" onclick="showToast('GOOGLE SIGNUP - STUB')">
+                        <i class="fab fa-google"></i> Sign up with Google
+                    </button>
+                    <button class="social-btn apple" id="appleBtnSignup" onclick="showToast('APPLE SIGNUP - STUB')">
+                        <i class="fab fa-apple"></i> Sign up with Apple
+                    </button>
+                </div>
+                <div class="divider"><span>OR CONTINUE WITH EMAIL</span></div>
+                
+                <div class="form-group input-icon-wrapper">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" placeholder="Full Name" id="signupName" class="premium-input">
+                </div>
+                <div class="form-group input-icon-wrapper">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" placeholder="Email Address" id="signupEmail" class="premium-input">
+                </div>
+                <div class="form-group input-icon-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" placeholder="Password" id="signupPassword" class="premium-input">
+                </div>
+                <div class="form-group input-icon-wrapper">
+                    <i class="fas fa-briefcase input-icon"></i>
+                    <select id="signupRole" class="premium-input">
+                        <option value="owner">PROBLEM OWNER</option>
+                        <option value="developer">DEVELOPER</option>
+                        <option value="advisor">ADVISOR</option>
+                    </select>
+                </div>
+                
+                <div class="form-group phone-group">
+                    <select id="phoneCode" class="premium-input country-code">
+                        <option value="+1">+1 (US)</option>
+                        <option value="+44">+44 (UK)</option>
+                        <option value="+91">+91 (IN)</option>
+                        <option value="+61">+61 (AU)</option>
+                        <option value="+81">+81 (JP)</option>
+                        <option value="+49">+49 (DE)</option>
+                    </select>
+                    <div class="input-icon-wrapper phone-input-wrapper">
+                        <i class="fas fa-phone input-icon"></i>
+                        <input type="tel" placeholder="Phone Number" id="signupPhone" class="premium-input" style="padding-left: 36px;">
+                    </div>
+                </div>
+
+                <div class="otp-row">
+                    <div class="input-icon-wrapper" style="flex: 1;">
+                        <i class="fas fa-shield-alt input-icon"></i>
+                        <input type="text" placeholder="SMS OTP" id="otpInput" class="premium-input">
+                    </div>
+                    <button class="btn-outline otp-btn" onclick="sendOTP()">SEND OTP</button>
+                </div>
+                
+                <button class="btn-primary auth-submit" onclick="demoSignup()">CREATE ACCOUNT</button>
+                <p class="auth-switch-text">
+                    Already have an account? <a href="#" onclick="toggleAuthView('login')">Sign in</a>
+                </p>
+            </div>
+
+            <div id="forgotView" style="display: none;">
+                <div class="auth-header">
+                    <h2>Reset Password</h2>
+                    <p>Enter your email to receive a password reset link.</p>
+                </div>
+                <div class="form-group input-icon-wrapper">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" placeholder="Email Address" id="forgotEmail" class="premium-input">
+                </div>
+                <button class="btn-primary auth-submit" onclick="showToast('RESET LINK SENT')">SEND RESET LINK</button>
+                <p class="auth-switch-text">
+                    Back to <a href="#" onclick="toggleAuthView('login')">Sign In</a>
+                </p>
+            </div>
         </div>
     </div>
 

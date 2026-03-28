@@ -1,22 +1,5 @@
-// Sample data
-const problems = [
-    { category: 'TECH', intent: 'CO-FOUNDER', title: 'AI DIAGNOSTIC TOOL FOR RURAL CLINICS', desc: 'Looking for technical co-founder to build AI-powered diagnostic tool for rural clinics...', views: 45, user: 'PS', time: '2m', locked: true },
-    { category: 'HEALTH', intent: 'DEV TEAM', title: 'TELEMEDICINE PLATFORM FOR ELDERLY', desc: 'Need full-stack team to build voice-first telemedicine app...', views: 128, user: 'RK', time: '1h', locked: false },
-    { category: 'FINTECH', intent: 'CONSULTANT', title: 'MICRO-INVESTMENT APP FOR RURAL WOMEN', desc: 'Seeking fintech consultant for micro-investment platform...', views: 67, user: 'MJ', time: '3h', locked: true },
-    { category: 'EDU', intent: 'TEAM', title: 'OFFLINE-FIRST LEARNING FOR RURAL STUDENTS', desc: 'Looking for team to build offline-first learning platform...', views: 82, user: 'SP', time: '5h', locked: false },
-    { category: 'AGRI', intent: 'CO-FOUNDER', title: 'DIRECT FARMER-TO-BUYER MARKETPLACE', desc: 'Seeking technical co-founder for farmer marketplace...', views: 56, user: 'AK', time: '1d', locked: true },
-    { category: 'FINTECH', intent: 'CONSULTANT', title: 'MICRO-CREDIT FOR WOMEN ENTREPRENEURS', desc: 'Need fintech consultant for micro-credit platform...', views: 73, user: 'RJ', time: '1d', locked: false },
-    { category: 'TECH', intent: 'CO-FOUNDER', title: 'AI CHATBOT FOR LEGAL AID', desc: 'Looking for AI expert to build legal aid chatbot...', views: 34, user: 'SN', time: '2d', locked: true },
-    { category: 'HEALTH', intent: 'DEV TEAM', title: 'MENTAL HEALTH APP FOR STUDENTS', desc: 'Need team to build anonymous mental health app...', views: 92, user: 'PK', time: '2d', locked: false },
-    { category: 'EDU', intent: 'TEAM', title: 'VOCATIONAL TRAINING PLATFORM', desc: 'Looking for team to build skill development platform...', views: 41, user: 'AM', time: '3d', locked: true },
-    { category: 'AGRI', intent: 'CO-FOUNDER', title: 'CROP DISEASE DETECTION APP', desc: 'Seeking technical co-founder for AI crop disease detection...', views: 63, user: 'VP', time: '3d', locked: false },
-    { category: 'FINTECH', intent: 'CONSULTANT', title: 'DIGITAL PAYMENTS FOR RURAL INDIA', desc: 'Need consultant for UPI-based payment solution...', views: 28, user: 'SK', time: '4d', locked: true },
-    { category: 'TECH', intent: 'CO-FOUNDER', title: 'IOT DEVICES FOR SMART FARMING', desc: 'Looking for hardware expert to build IoT sensors...', views: 51, user: 'RT', time: '4d', locked: false },
-    { category: 'HEALTH', intent: 'DEV TEAM', title: 'WEARABLE DEVICE FOR ELDERLY CARE', desc: 'Need team to build wearable with fall detection...', views: 37, user: 'DM', time: '5d', locked: true },
-    { category: 'EDU', intent: 'TEAM', title: 'GAMIFIED LEARNING FOR KIDS', desc: 'Looking for team to build educational games...', views: 44, user: 'AG', time: '5d', locked: false },
-    { category: 'FINTECH', intent: 'CONSULTANT', title: 'BLOCKCHAIN FOR LAND RECORDS', desc: 'Need blockchain expert for land record system...', views: 19, user: 'KS', time: '6d', locked: true },
-    { category: 'AGRI', intent: 'CO-FOUNDER', title: 'COLD STORAGE MONITORING SYSTEM', desc: 'Need IoT expert for cold storage monitoring...', views: 32, user: 'BM', time: '6d', locked: false }
-];
+// Data populated from API
+let problems = [];
 
 const stories = [
     { title: 'FROM RURAL CLINIC TO 10M USERS', desc: 'How a healthcare problem posted on PROBLEMidea became a platform serving millions across India.' },
@@ -33,7 +16,7 @@ const pricingPlans = [
 
 // Page content for footer links
 const pageContents = {
-    'newsletter': { title: 'NEWSLETTER', content: 'Subscribe to our weekly newsletter featuring the latest problems, developer stories, and tech insights. Get curated content delivered straight to your inbox.<br><br><input type="email" placeholder="Enter your email address" style="width:100%; padding:12px 15px; margin-bottom:15px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(255, 255, 255, 0.05); color: var(--text-primary); outline: none;"><button class="btn-primary" style="width:100%; padding:14px;" onclick="showToast(\'SUBSCRIBED SUCCESSFULLY!\'); closeModal(\'pageModal\');">SUBSCRIBE</button>' },
+    'newsletter': { title: 'NEWSLETTER', content: 'Subscribe to our weekly newsletter featuring the latest problems, developer stories, and tech insights. Get curated content delivered straight to your inbox.<br><br><input type="email" id="newsletterEmailInput" placeholder="Enter your email address" style="width:100%; padding:12px 15px; margin-bottom:15px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(255, 255, 255, 0.05); color: var(--text-primary); outline: none;"><button class="btn-primary" style="width:100%; padding:14px;" onclick="window.subscribeNewsletter()">SUBSCRIBE</button>' },
     'apps': { title: 'APPS', content: 'Download our mobile apps for iOS and Android. Access IdeaventureX on the go, get real-time notifications, and never miss a match.' },
     'about': { title: 'ABOUT US', content: 'IdeaventureX is the first gated marketplace connecting problem owners with verified developers. Founded in 2026, we help turn real-world problems into successful ventures.' },
     'faq': { title: 'FREQUENTLY ASKED QUESTIONS', content: 'Find answers to common questions about posting problems, finding developers, verification process, and how our matching system works.' },
@@ -128,12 +111,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    checkSession();
     loadProblems();
     loadStories();
     loadPricing();
     loadDashboardData();
     updateDate();
 });
+
+function checkSession() {
+    fetch('api/auth.php?action=check_session')
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === 'success' && data.logged_in) {
+            isLoggedIn = true;
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('profileBadge').style.display = 'flex';
+            document.getElementById('profileType').textContent = data.user.role.toUpperCase();
+        }
+    });
+}
 
 // Subscribe alert function
 function subscribeAlert() {
@@ -193,12 +190,15 @@ function loadProblems() {
     const homeGrid = document.getElementById('homeProblemsGrid');
     const exploreGrid = document.getElementById('exploreProblemsGrid');
     
-    if (homeGrid) {
-        homeGrid.innerHTML = problems.map(p => createProblemCard(p)).join('');
-    }
-    if (exploreGrid) {
-        exploreGrid.innerHTML = problems.slice(0, 12).map(p => createProblemCard(p)).join('');
-    }
+    fetch('api/problems.php?action=list')
+     .then(r => r.json())
+     .then(data => {
+         if (data.status === 'success') {
+             problems = data.data;
+             if (homeGrid) homeGrid.innerHTML = problems.map(p => createProblemCard(p)).join('');
+             if (exploreGrid) exploreGrid.innerHTML = problems.map(p => createProblemCard(p)).join('');
+         }
+     });
 }
 
 function createProblemCard(p) {
@@ -283,20 +283,34 @@ function submitAdRequest() {
     const name = document.getElementById('adName')?.value;
     const company = document.getElementById('adCompany')?.value;
     const email = document.getElementById('adEmail')?.value;
+    const phone = document.getElementById('adPhone')?.value;
+    const msg = document.getElementById('adMessage')?.value;
     
     if (!name || !company || !email) {
         showToast('Please fill all required fields');
         return;
     }
     
-    showToast('REQUEST SUBMITTED! OUR TEAM WILL CONTACT YOU SOON.');
+    const formData = new FormData();
+    formData.append('action', 'ad_request');
+    formData.append('name', name);
+    formData.append('company', company);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('message', msg);
     
-    if (document.getElementById('adName')) document.getElementById('adName').value = '';
-    if (document.getElementById('adCompany')) document.getElementById('adCompany').value = '';
-    if (document.getElementById('adEmail')) document.getElementById('adEmail').value = '';
-    if (document.getElementById('adPhone')) document.getElementById('adPhone').value = '';
-    if (document.getElementById('adMessage')) document.getElementById('adMessage').value = '';
-    if (document.getElementById('adTerms')) document.getElementById('adTerms').checked = false;
+    fetch('api/forms.php', { method: 'POST', body: formData })
+    .then(r => r.json())
+    .then(d => {
+        showToast(d.message);
+        if(d.status === 'success') {
+            document.getElementById('adName').value = '';
+            document.getElementById('adCompany').value = '';
+            document.getElementById('adEmail').value = '';
+            document.getElementById('adPhone').value = '';
+            document.getElementById('adMessage').value = '';
+        }
+    });
 }
 
 function updateDate() {
@@ -325,15 +339,18 @@ function toggleTheme() {
 }
 
 function logout() {
-    document.getElementById('authButtons').style.display = 'flex';
-    document.getElementById('profileBadge').style.display = 'none';
-    document.getElementById('logoutDropdown')?.classList.remove('show');
-    document.getElementById('adminLogoutDropdown')?.classList.remove('show');
-    document.getElementById('adminLoginBox').style.display = 'block';
-    document.getElementById('adminPanel').style.display = 'none';
-    showToast('LOGGED OUT SUCCESSFULLY');
-    switchPage('home');
-    document.getElementById('mobileMenu').style.display = 'none';
+    const formData = new FormData();
+    formData.append('action', 'logout');
+    fetch('api/auth.php', {method: 'POST', body: formData}).then(() => {
+        document.getElementById('authButtons').style.display = 'flex';
+        document.getElementById('profileBadge').style.display = 'none';
+        document.getElementById('logoutDropdown')?.classList.remove('show');
+        isLoggedIn = false;
+        showToast('LOGGED OUT SUCCESSFULLY');
+        switchPage('home');
+        loadProblems(); // Reload to lock items
+        document.getElementById('mobileMenu').style.display = 'none';
+    });
 }
 
 function switchPage(page) {
@@ -387,11 +404,41 @@ function selectType(type) {
 }
 
 function openModal(t) { 
-    document.getElementById(t + 'Modal').style.display = 'flex'; 
+    if (t === 'login' || t === 'signup') {
+        openAuthModal(t);
+    } else {
+        document.getElementById(t + 'Modal').style.display = 'flex'; 
+    }
+}
+
+function openAuthModal(view = 'login') {
+    const modal = document.getElementById('authModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    toggleAuthView(view);
+    
+    // Apple login visibility - Show only for iOS as requested
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const appleBtn = document.getElementById('appleBtn');
+    if (appleBtn) {
+        appleBtn.style.display = isIOS ? 'flex' : 'none';
+    }
+}
+
+function toggleAuthView(view) {
+    const views = ['login', 'signup', 'forgot'];
+    views.forEach(v => {
+        const el = document.getElementById(v + 'View');
+        if (el) el.style.display = 'none';
+    });
+    
+    const target = document.getElementById(view + 'View');
+    if (target) target.style.display = 'block';
 }
 
 function closeModal(id) { 
-    document.getElementById(id).style.display = 'none'; 
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'none'; 
 }
 
 function openEditProfileModal() {
@@ -400,31 +447,102 @@ function openEditProfileModal() {
 }
 
 function demoLogin() {
-    closeModal('loginModal');
-    document.getElementById('authButtons').style.display = 'none';
-    document.getElementById('profileBadge').style.display = 'flex';
-    isLoggedIn = true;
-    showToast('WELCOME BACK!');
-    window.location.href = 'dashboard.html';
+    const email = document.getElementById('loginEmail').value;
+    const pass = document.getElementById('loginPassword').value;
+    
+    const fd = new FormData();
+    fd.append('action', 'login');
+    fd.append('email', email);
+    fd.append('password', pass);
+    
+    fetch('api/auth.php', {method: 'POST', body: fd})
+    .then(r => r.json())
+    .then(d => {
+        if(d.status === 'success') {
+            closeModal('authModal');
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('profileBadge').style.display = 'flex';
+            document.getElementById('profileType').textContent = d.role.toUpperCase();
+            isLoggedIn = true;
+            showToast('WELCOME BACK!');
+            loadProblems(); // Unlock problems
+        } else {
+            showToast(d.message);
+        }
+    });
 }
 
 function demoSignup() {
+    const name = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const pass = document.getElementById('signupPassword').value;
     const role = document.getElementById('signupRole').value;
-    userType = role.includes('OWNER') ? 'owner' : 'developer';
+    const phoneCode = document.getElementById('phoneCode').value;
+    const phoneNum = document.getElementById('signupPhone').value;
     
-    closeModal('signupModal');
-    document.getElementById('authButtons').style.display = 'none';
-    document.getElementById('profileBadge').style.display = 'flex';
-    document.getElementById('profileType').textContent = role.includes('OWNER') ? 'OWNER' : 'DEVELOPER';
-    isLoggedIn = true;
-    showToast('ACCOUNT CREATED!');
-    window.location.href = 'dashboard.html';
+    // Combine phone code and number for the DB
+    const globalPhone = phoneNum ? `${phoneCode}${phoneNum}` : '';
+    
+    const fd = new FormData();
+    fd.append('action', 'register');
+    fd.append('name', name);
+    fd.append('email', email);
+    fd.append('password', pass);
+    fd.append('role', role);
+    fd.append('phone', globalPhone);
+
+    fetch('api/auth.php', {method: 'POST', body: fd})
+    .then(r => r.json())
+    .then(d => {
+        if(d.status === 'success') {
+            closeModal('authModal');
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('profileBadge').style.display = 'flex';
+            document.getElementById('profileType').textContent = d.role.toUpperCase();
+            isLoggedIn = true;
+            showToast('ACCOUNT CREATED!');
+            loadProblems();
+        } else {
+            showToast(d.message);
+        }
+    });
 }
 
-function adminLogin() {
-    document.getElementById('adminLoginBox').style.display = 'none';
-    document.getElementById('adminPanel').style.display = 'block';
-    showToast('WELCOME ADMIN');
+function sendOTP() {
+    const phoneCode = document.getElementById('phoneCode').value;
+    const phoneNum = document.getElementById('signupPhone').value;
+    
+    if(!phoneNum) {
+        showToast('Please enter a phone number first');
+        return;
+    }
+    
+    const globalPhone = `${phoneCode}${phoneNum}`;
+    const fd = new FormData();
+    fd.append('action', 'send_otp');
+    fd.append('phone', globalPhone);
+    
+    fetch('api/auth.php', {method: 'POST', body: fd})
+    .then(r => r.json())
+    .then(d => {
+        showToast(d.message);
+    })
+    .catch(() => {
+        showToast('FAILED TO SEND OTP');
+    });
+}
+
+// Global Newsletter Subscribe intercept via JS
+window.subscribeNewsletter = function() {
+    const input = document.getElementById('newsletterEmailInput');
+    if(!input || !input.value) return;
+    const fd = new FormData();
+    fd.append('action', 'subscribe');
+    fd.append('email', input.value);
+    fetch('api/forms.php', {method:'POST', body:fd}).then(r=>r.json()).then(d => {
+        showToast(d.message);
+        if(d.status === 'success') closeModal('pageModal');
+    });
 }
 
 function showToast(msg) {

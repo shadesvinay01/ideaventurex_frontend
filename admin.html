@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - IdeaventureX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body { background: var(--bg-primary); color: var(--text-primary); padding: 40px; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .admin-table th, .admin-table td { padding: 12px; border-bottom: 1px solid var(--border-color); text-align: left; }
+        .admin-table th { background: rgba(0,0,0,0.2); }
+        .btn-small { padding: 4px 10px; font-size: 12px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="adminLoginBox" class="admin-login-box" style="margin: 100px auto; max-width: 400px;">
+        <h2 style="text-align: center; margin-bottom: 20px;">ADMIN ACCESS</h2>
+        <input type="email" placeholder="admin@ideaventurex.com" value="admin@ideaventurex.com" id="adminEmail" class="linked-in-input">
+        <input type="password" placeholder="••••••••" value="admin123" id="adminPassword" class="linked-in-input" style="margin-bottom: 15px;">
+        <button class="btn-primary" onclick="adminLogin()" style="width: 100%; padding: 14px;">ACCESS DASHBOARD</button>
+        <p id="adminError" style="color: #ff4757; text-align: center; margin-top: 10px;"></p>
+    </div>
+
+    <div id="adminPanel" class="admin-panel" style="display: none; max-width: 1200px; margin: 0 auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <h2 style="font-size:36px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">ADMIN INTELLIGENCE</h2>
+            <div>
+                <button class="btn-outline" onclick="window.location.href='index.html'">MAIN SITE</button>
+                <button class="btn-outline" onclick="adminLogout()" style="border-color: #ff4757; color: #ff4757;">LOGOUT</button>
+            </div>
+        </div>
+
+        <div class="admin-stats" id="adminStatsGrid">
+            <div class="stat-card-large"><h3 id="statProblems">0</h3><p>TOTAL PROBLEMS</p></div>
+            <div class="stat-card-large"><h3 id="statUsers">0</h3><p>TOTAL USERS</p></div>
+            <div class="stat-card-large"><h3 id="statAds">0</h3><p>AD REQUESTS</p></div>
+            <div class="stat-card-large"><h3 id="statSubs">0</h3><p>NEWSLETTER SUBS</p></div>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <h3>👁️ ALL USERS</h3>
+            <table class="admin-table" id="usersTable">
+                <thead><tr><th>ID</th><th>NAME</th><th>EMAIL</th><th>ROLE</th><th>ACTION</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <h3>📝 ALL PROBLEMS</h3>
+            <table class="admin-table" id="problemsTable">
+                <thead><tr><th>ID</th><th>TITLE</th><th>AUTHOR</th><th>CATEGORY</th><th>ACTION</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        
+        <div style="margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+             <div>
+                 <h3>📧 NEWSLETTER SUBS</h3>
+                 <ul id="subsList" style="list-style: none; padding: 0; margin-top: 15px;"></ul>
+             </div>
+             <div>
+                 <h3>📢 AD REQUESTS</h3>
+                 <ul id="adsList" style="list-style: none; padding: 0; margin-top: 15px;"></ul>
+             </div>
+        </div>
+    </div>
+
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>
