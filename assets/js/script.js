@@ -33,7 +33,7 @@ const pricingPlans = [
 
 // Page content for footer links
 const pageContents = {
-    'newsletter': { title: 'NEWSLETTER', content: 'Subscribe to our weekly newsletter featuring the latest problems, developer stories, and tech insights. Get curated content delivered straight to your inbox.' },
+    'newsletter': { title: 'NEWSLETTER', content: 'Subscribe to our weekly newsletter featuring the latest problems, developer stories, and tech insights. Get curated content delivered straight to your inbox.<br><br><input type="email" placeholder="Enter your email address" style="width:100%; padding:12px 15px; margin-bottom:15px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(255, 255, 255, 0.05); color: var(--text-primary); outline: none;"><button class="btn-primary" style="width:100%; padding:14px;" onclick="showToast(\'SUBSCRIBED SUCCESSFULLY!\'); closeModal(\'pageModal\');">SUBSCRIBE</button>' },
     'apps': { title: 'APPS', content: 'Download our mobile apps for iOS and Android. Access IdeaventureX on the go, get real-time notifications, and never miss a match.' },
     'about': { title: 'ABOUT US', content: 'IdeaventureX is the first gated marketplace connecting problem owners with verified developers. Founded in 2026, we help turn real-world problems into successful ventures.' },
     'faq': { title: 'FREQUENTLY ASKED QUESTIONS', content: 'Find answers to common questions about posting problems, finding developers, verification process, and how our matching system works.' },
