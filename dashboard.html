@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - IdeaventureX</title>
+    <!-- Fonts and CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg-primary);
+        }
+        .dashboard-sidebar {
+            width: 250px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+        }
+        .dashboard-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 40px 60px;
+        }
+        .sidebar-link {
+            padding: 15px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: 0.3s;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--gradient-1);
+        }
+        .linked-in-input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            margin-top: 10px;
+        }
+        @media(max-width: 768px) {
+            .dashboard-layout { flex-direction: column; }
+            .dashboard-sidebar { width: 100%; height: auto; position: static; padding: 20px; border-bottom: 1px solid var(--border-color); border-right: none;}
+            .dashboard-content { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <div class="dashboard-sidebar">
+            <div class="logo" style="margin-bottom: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px;" onclick="window.location.href='index.html'">
+                <div class="bulb-icon" style="position: relative; width: 30px; height: 30px;">
+                    <div class="bulb-glass" style="width: 20px; height: 20px; background: linear-gradient(135deg, #FFD700, #FFA500); border-radius: 50% 50% 30% 30%; position: absolute; left: 5px; animation: bulbGlow 2s infinite; box-shadow: 0 0 15px #FFD700;"></div>
+                    <div class="bulb-base" style="width: 12px; height: 8px; background: #888; border-radius: 0 0 4px 4px; position: absolute; bottom: 0; left: 9px;"></div>
+                </div>
+                <div class="logo-text" style="font-size: 20px; font-weight: 700; color: var(--text-primary);"><span style="color: var(--gradient-1);">Idea</span>ventureX</div>
+            </div>
+            
+            <a class="sidebar-link active" onclick="switchDashTab('overview', this)"><i class="fas fa-home"></i> Overview</a>
+            <a class="sidebar-link" onclick="switchDashTab('post-idea', this)"><i class="fas fa-plus-circle"></i> Post an Idea</a>
+            <a class="sidebar-link" onclick="switchDashTab('my-ideas', this)"><i class="fas fa-lightbulb"></i> Posted Ideas</a>
+            <a class="sidebar-link" onclick="switchDashTab('liked-ideas', this)"><i class="fas fa-heart"></i> Ideas You Liked</a>
+            <a class="sidebar-link" onclick="switchDashTab('messages', this)"><i class="fas fa-comment"></i> Messages <span style="background:var(--gradient-3); color:white; border-radius:10px; padding:2px 8px; font-size:10px; margin-left:auto;">1</span></a>
+            
+            <div style="margin-top: auto;">
+                <a class="sidebar-link" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back to Main Site</a>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="dashboard-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                <h1 style="font-size: 32px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">DASHBOARD</h1>
+                <div class="theme-toggle" onclick="toggleTheme()" style="cursor:pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--card-bg); border: 1px solid var(--border-color);"><i class="fas fa-moon"></i></div>
+            </div>
+
+            <div class="profile-header" style="background: var(--card-bg); border-radius: 20px; padding: 40px; border: 1px solid var(--border-color); display: flex; flex-wrap: wrap; align-items: center; gap: 30px; margin-bottom: 30px; position:relative; overflow:hidden;">
+                <div class="profile-avatar-large" style="width: 100px; height: 100px; min-width: 100px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: white;">AK</div>
+                <div class="profile-info" style="flex: 1; z-index:1; min-width: 250px;">
+                    <h2 style="font-size: 32px; margin-bottom: 5px; color: var(--text-primary);">ALEX KUMAR</h2>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">SENIOR FULL-STACK DEVELOPER · VERIFIED <i class="fas fa-check-circle" style="color:var(--gradient-1);"></i></p>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <span style="font-size: 11px; padding: 4px 12px; border: 1px solid var(--border-color); border-radius: 20px; color: var(--text-secondary);">Node.js</span>
+                        <span style="font-size: 11px; padding: 4px 12px; border: 1px solid var(--border-color); border-radius: 20px; color: var(--text-secondary);">React</span>
+                        <span style="font-size: 11px; padding: 4px 12px; border: 1px solid var(--border-color); border-radius: 20px; color: var(--text-secondary);">Firebase</span>
+                    </div>
+                </div>
+                <div style="text-align: right; min-width: 200px;">
+                    <p style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">LinkedIn Profile URL</p>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="text" class="linked-in-input" style="margin:0; flex:1;" placeholder="https://linkedin.com/in/alex" value="https://linkedin.com/in/alexkumar">
+                        <button class="btn-primary" style="padding: 10px 15px; border-radius: 8px; border:none; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); color:white; cursor:pointer;" onclick="alert('Profile Updated Successfully')"><i class="fas fa-save"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Contents -->
+            <div id="overview-tab" class="dash-view">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div class="stat-card-large" style="background: var(--card-bg); border-radius: 20px; padding: 30px; border: 1px solid var(--border-color); text-align: center; transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <h3 style="font-size: 40px; color: var(--gradient-1); margin-bottom: 10px;">2</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; font-weight: 600; letter-spacing: 1px;">IDEAS POSTED</p>
+                    </div>
+                    <div class="stat-card-large" style="background: var(--card-bg); border-radius: 20px; padding: 30px; border: 1px solid var(--border-color); text-align: center; transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <h3 style="font-size: 40px; color: var(--gradient-3); margin-bottom: 10px;">5</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; font-weight: 600; letter-spacing: 1px;">IDEAS LIKED (MATCHES)</p>
+                    </div>
+                    <div class="stat-card-large" style="background: var(--card-bg); border-radius: 20px; padding: 30px; border: 1px solid var(--border-color); text-align: center; transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <h3 style="font-size: 40px; color: var(--gradient-2); margin-bottom: 10px;">12</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; font-weight: 600; letter-spacing: 1px;">PROFILE VIEWS</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="post-idea-tab" class="dash-view" style="display: none;">
+                <div style="background: var(--card-bg); border-radius: 20px; padding: 40px; border: 1px solid var(--border-color);">
+                    <h2 style="margin-bottom: 10px; color: var(--text-primary);">Post a New Idea</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 30px;">Share your concept under NDA to find the perfect technical co-founder. Data is purely handled internally until matched.</p>
+                    
+                    <label style="display:block; color:var(--text-primary); margin-bottom:10px; font-size:14px;">Idea Title</label>
+                    <input type="text" class="linked-in-input" placeholder="e.g. AI-Powered Healthcare Diagnostics" style="margin-bottom: 25px;">
+                    
+                    <label style="display:block; color:var(--text-primary); margin-bottom:10px; font-size:14px;">Describe the core problem...</label>
+                    <textarea class="linked-in-input" placeholder="I face a problem where..." rows="6" style="margin-bottom: 25px; border-radius: 12px; font-family: 'Inter', sans-serif; resize: vertical;"></textarea>
+
+                    <label style="display:block; color:var(--text-primary); margin-bottom:10px; font-size:14px;">Developer Skills Needed</label>
+                    <input type="text" class="linked-in-input" placeholder="e.g. Python, Machine Learning, AWS" style="margin-bottom: 30px;">
+                    
+                    <button class="btn-primary" style="padding: 15px 30px; border-radius: 30px; font-size: 14px; width: 100%; max-width: 300px; display: block; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); color: white; cursor: pointer; border: none; font-weight: bold; letter-spacing: 1px;" onclick="alert('Success! Your Idea is now live in the global pool under strict IP protection.')">PUBLISH IDEA SECURELY</button>
+                </div>
+            </div>
+
+            <div id="my-ideas-tab" class="dash-view" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: var(--text-primary);">Your Posted Ideas</h2>
+                <div style="background: var(--card-bg); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; transition: 0.3s;" onmouseover="this.style.borderColor='var(--gradient-1)'" onmouseout="this.style.borderColor='var(--border-color)'">
+                    <div>
+                        <h4 style="color: var(--text-primary); font-size: 18px;">AI Diagnostics Tool</h4>
+                        <p style="color:var(--text-secondary); font-size:13px; margin-top:8px;">Looking for: Python/ML Developer</p>
+                    </div>
+                    <span style="background: rgba(20, 184, 166, 0.1); color: #14B8A6; padding: 6px 16px; border-radius: 30px; font-size: 12px; font-weight: 600;">LIVE</span>
+                </div>
+                <div style="background: var(--card-bg); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; transition: 0.3s;" onmouseover="this.style.borderColor='var(--gradient-1)'" onmouseout="this.style.borderColor='var(--border-color)'">
+                    <div>
+                        <h4 style="color: var(--text-primary); font-size: 18px;">Fintech Micro-Lending Model</h4>
+                        <p style="color:var(--text-secondary); font-size:13px; margin-top:8px;">Looking for: Blockchain Expert</p>
+                    </div>
+                    <span style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 6px 16px; border-radius: 30px; font-size: 12px; font-weight: 600; border: 1px solid var(--border-color);">DRAFT</span>
+                </div>
+            </div>
+
+            <div id="liked-ideas-tab" class="dash-view" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: var(--text-primary);">Ideas You Liked ❤️</h2>
+                <div style="background: var(--card-bg); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); display:flex; flex-wrap: wrap; justify-content:space-between; align-items:center; margin-bottom:15px; transition: 0.3s;" onmouseover="this.style.borderColor='var(--gradient-3)'" onmouseout="this.style.borderColor='var(--border-color)'">
+                    <div style="margin-bottom: 10px;">
+                        <h4 style="color: var(--text-primary); font-size: 18px;">Smart AgriTech Platform</h4>
+                        <p style="color:var(--text-secondary); font-size:13px; margin-top:8px;">Owner: Neha M. · Posted 2 days ago</p>
+                    </div>
+                    <button class="btn-primary" style="padding: 10px 20px; font-size:13px; border-radius: 30px; background: linear-gradient(135deg, var(--gradient-3), var(--gradient-1)); color: white; cursor: pointer; border: none;" onclick="switchDashTab('messages', document.querySelectorAll('.sidebar-link')[4])"><i class="fas fa-comment"></i> MESSAGE OWNER</button>
+                </div>
+            </div>
+
+            <div id="messages-tab" class="dash-view" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: var(--text-primary);">Messages</h2>
+                <div style="background: var(--card-bg); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); display:flex; gap: 20px; align-items:center; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='var(--card-bg)'">
+                    <div class="avatar" style="width:60px; height:60px; min-width:60px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size: 20px; font-weight: bold;">NM</div>
+                    <div style="flex:1;">
+                        <h4 style="color: var(--text-primary); font-size: 16px;">Neha M. <span style="font-size:11px; color:var(--text-secondary); float:right;">12:45 PM</span></h4>
+                        <p style="color:var(--text-secondary); font-size:14px; margin-top:8px;">Hi Alex, loved your profile! Are you interested in the AgriTech idea?</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.querySelector('.theme-toggle i');
+            icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        function switchDashTab(tabId, element) {
+            document.querySelectorAll('.dash-view').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId + '-tab').style.display = 'block';
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>

@@ -31,8 +31,8 @@
     <meta name="twitter:image" content="https://ideaventurex.com/twitter-image.jpg">
     
     <!-- FAVICON -->
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%232D5FFF'/><text x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial'>P</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%232D5FFF'/><text x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial'>P</text></svg>">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23FFD700'/><text x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial'>I</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23FFD700'/><text x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial'>I</text></svg>">
     
     <!-- SCHEMA MARKUP - JSON-LD -->
     <script type="application/ld+json">
@@ -71,9 +71,9 @@
     <!-- CSS FILES -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
     <!-- Progress Bar -->
@@ -114,7 +114,7 @@
                 <span id="profileType">BUILDER</span>
                 <span class="notification-badge">3</span>
                 <div class="logout-dropdown" id="logoutDropdown" onclick="event.stopPropagation()">
-                    <a onclick="switchPage('dashboard'); event.stopPropagation();">📊 DASHBOARD</a>
+                    <a href="dashboard.html" onclick="event.stopPropagation();">📊 DASHBOARD</a>
                     <a onclick="openEditProfileModal(); event.stopPropagation();">✏️ EDIT PROFILE</a>
                     <a onclick="logout(); event.stopPropagation();">🚪 LOGOUT</a>
                 </div>
@@ -136,10 +136,12 @@
     <div class="container">
         <!-- HOME PAGE -->
         <div id="home-page" class="page active-page">
-            <div class="hero">
-                <div class="hero-left">
-                    <h1>WHERE<br><span class="hero-gradient-text">PROBLEMS</span><br>BECOME VENTURES</h1>
-                    <p>The first gated marketplace connecting problem owners with verified developers. Full traceability, zero noise, mediation ready.</p>
+            <div class="hero" style="background: url('assets/images/hero.png') no-repeat center / cover; border-radius: 30px; padding: 120px 60px; margin: 20px 0; border: 1px solid var(--border-color); position: relative; overflow: hidden;">
+                <div style="position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg-primary) 40%, transparent); z-index: 0;"></div>
+                
+                <div class="hero-left" style="position: relative; z-index: 1;">
+                    <h1 style="font-size: 64px;">WHERE<br><span class="hero-gradient-text" style="color: var(--text-primary); text-shadow: 1px 1px 4px rgba(0,0,0,0.1);">PROBLEMS</span><br>BECOME VENTURES</h1>
+                    <p style="font-size: 16px; max-width: 480px;">The definitive network connecting verified innovators. Secure your IP, find the perfect co-founder, and build scalable ventures without the noise.</p>
                     <div class="hero-stats">
                         <div class="stat-item"><div class="stat-number">342</div><p>PROBLEMS</p></div>
                         <div class="stat-item"><div class="stat-number">1.8K</div><p>DEVELOPERS</p></div>
@@ -159,7 +161,30 @@
                         <li><i class="fas fa-shield-alt"></i> IP PROTECTION & NDA READY</li>
                         <li><i class="fas fa-chart-line"></i> TURN IDEAS INTO SCALABLE VENTURES</li>
                     </ul>
-                    <button class="btn-primary" style="width:100%; padding:14px;" onclick="openModal('signup')">CREATE ACCOUNT →</button>
+                    <button class="btn-primary" style="width:100%; padding:14px; font-size:14px; letter-spacing:1px;" onclick="openModal('signup')">CREATE ACCOUNT &rarr;</button>
+                </div>
+            </div>
+
+            <!-- ROADMAP SECTION -->
+            <div class="roadmap-section" style="margin: 80px 0; padding: 60px; background: rgba(255, 255, 255, 0.02); border-radius: 40px; border: 1px solid var(--border-color); text-align: center; backdrop-filter: blur(10px);">
+                <h2 style="font-size: 40px; margin-bottom: 20px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">HOW IT WORKS</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 50px;">Follow our simple roadmap to find your dream team and build your startup idea.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+                    <div class="roadmap-step" style="padding: 30px; background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='var(--gradient-1)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);">1</div>
+                        <h3>Post Your Idea</h3>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-top: 10px;">Share your problem or startup concept securely under our strict intellectual property NDA.</p>
+                    </div>
+                    <div class="roadmap-step" style="padding: 30px; background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='var(--gradient-2)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--gradient-2), var(--gradient-3)); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);">2</div>
+                        <h3>Get Matched</h3>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-top: 10px;">Our AI pairs you with the perfect developers and co-founders whose skills align with your needs.</p>
+                    </div>
+                    <div class="roadmap-step" style="padding: 30px; background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='var(--gradient-3)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border-color)'">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--gradient-3), var(--gradient-1)); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3);">3</div>
+                        <h3>Build & Grow</h3>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-top: 10px;">Connect directly via messaging in dashboard, form your team, and turn your idea into reality.</p>
+                    </div>
                 </div>
             </div>
 
@@ -264,64 +289,7 @@
             </div>
         </div>
 
-        <!-- DASHBOARD PAGE -->
-        <div id="dashboard-page" class="page">
-            <div class="dashboard-page">
-                <div class="dashboard-header">
-                    <h1>YOUR DASHBOARD</h1>
-                    <div class="date" id="currentDate"></div>
-                </div>
-
-                <div class="profile-header">
-                    <div class="profile-avatar-large">AK</div>
-                    <div class="profile-info">
-                        <h2>ALEX KUMAR</h2>
-                        <p>DEVELOPER · MEMBER SINCE 2025 · VERIFIED ✓</p>
-                    </div>
-                    <div class="profile-stats">
-                        <div class="profile-stat-item"><div class="number">12</div><div class="label">PROBLEMS</div></div>
-                        <div class="profile-stat-item"><div class="number">5</div><div class="label">INTERESTS</div></div>
-                        <div class="profile-stat-item"><div class="number">2</div><div class="label">MATCHES</div></div>
-                    </div>
-                </div>
-
-                <div class="dashboard-tabs">
-                    <div class="dashboard-tab active" onclick="switchDashboardTab('overview')">OVERVIEW</div>
-                    <div class="dashboard-tab" onclick="switchDashboardTab('problems')">MY PROBLEMS</div>
-                    <div class="dashboard-tab" onclick="switchDashboardTab('interests')">INTERESTS</div>
-                    <div class="dashboard-tab" onclick="switchDashboardTab('matches')">MATCHES</div>
-                </div>
-
-                <div id="overview-tab">
-                    <div class="dashboard-stats-grid" id="dashboardStats"></div>
-                    <div class="activity-section">
-                        <div class="activity-header">
-                            <h3>📈 ACTIVITY OVERVIEW</h3>
-                            <span class="view-all" onclick="showToast('VIEW DETAILS')">DETAILS →</span>
-                        </div>
-                        <div class="activity-chart" id="activityChart"></div>
-                    </div>
-                    <h3 class="section-title">RECENT MATCHES</h3>
-                    <div class="matches-grid" id="recentMatches"></div>
-                </div>
-
-                <div id="problems-tab" style="display:none;">
-                    <h3 class="section-title">YOUR PROBLEMS</h3>
-                    <div class="problems-list" id="myProblemsList"></div>
-                    <button class="btn-primary" onclick="showToast('CREATE NEW PROBLEM')">+ POST NEW PROBLEM</button>
-                </div>
-
-                <div id="interests-tab" style="display:none;">
-                    <h3 class="section-title">YOUR INTERESTS</h3>
-                    <div class="interests-grid" id="interestsGrid"></div>
-                </div>
-
-                <div id="matches-tab" style="display:none;">
-                    <h3 class="section-title">ACTIVE MATCHES</h3>
-                    <div class="matches-grid" id="matchesGrid"></div>
-                </div>
-            </div>
-        </div>
+        <!-- DASHBOARD MOVED TO dashbaord.html -->
 
         <!-- ADMIN PAGE -->
         <div id="admin-page" class="page">
@@ -405,10 +373,10 @@
                 </div>
                 <div class="footer-section">
                     <h4>COMMUNITY</h4>
-                    <a onclick="showPage('advertise')">Advertise</a>
-                    <a onclick="showPage('contact')">Contact us</a>
-                    <a onclick="showPage('twitter')">Twitter</a>
-                    <a onclick="showPage('linkedin')">LinkedIn</a>
+                    <a style="cursor:pointer;" onclick="window.open('https://chat.whatsapp.com/12345', '_blank')"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <a style="cursor:pointer;" onclick="window.open('https://instagram.com/ideaventurex', '_blank')"><i class="fab fa-instagram"></i> Instagram</a>
+                    <a style="cursor:pointer;" onclick="window.open('https://linkedin.com/company/ideaventurex', '_blank')"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                    <a onclick="showPage('contact')"><i class="fas fa-envelope"></i> Contact us</a>
                 </div>
                 <div class="footer-section">
                     <h4>CATEGORIES</h4>
@@ -514,6 +482,6 @@
     <div class="toast" id="toast">MESSAGE</div>
 
     <!-- JavaScript -->
-    <script src="script.js"></script>
+    <script src="assets/js/script.js"></script>
 </body>
 </html>

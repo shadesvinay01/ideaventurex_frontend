@@ -34,16 +34,16 @@ const pricingPlans = [
 // Page content for footer links
 const pageContents = {
     'newsletter': { title: 'NEWSLETTER', content: 'Subscribe to our weekly newsletter featuring the latest problems, developer stories, and tech insights. Get curated content delivered straight to your inbox.' },
-    'apps': { title: 'APPS', content: 'Download our mobile apps for iOS and Android. Access PROBLEMidea on the go, get real-time notifications, and never miss a match.' },
-    'about': { title: 'ABOUT US', content: 'PROBLEMidea is the first gated marketplace connecting problem owners with verified developers. Founded in 2025, we help turn real-world problems into successful ventures.' },
+    'apps': { title: 'APPS', content: 'Download our mobile apps for iOS and Android. Access IdeaventureX on the go, get real-time notifications, and never miss a match.' },
+    'about': { title: 'ABOUT US', content: 'IdeaventureX is the first gated marketplace connecting problem owners with verified developers. Founded in 2026, we help turn real-world problems into successful ventures.' },
     'faq': { title: 'FREQUENTLY ASKED QUESTIONS', content: 'Find answers to common questions about posting problems, finding developers, verification process, and how our matching system works.' },
-    'terms': { title: 'TERMS OF SERVICE', content: 'By using PROBLEMidea, you agree to our terms of service. This includes guidelines for posting, communication, and dispute resolution between problem owners and developers.' },
-    'privacy': { title: 'PRIVACY & COOKIES', content: 'We take your privacy seriously. Learn how we collect, use, and protect your personal information. Read about our cookie policy and data protection practices.' },
-    'privacy-choices': { title: 'PRIVACY CHOICES', content: 'Manage your privacy preferences. Control what data you share, opt out of data collection, and customize your experience on PROBLEMidea.' },
-    'ilms': { title: 'ILMS.TXT', content: 'Information Location and Management Standards. This page contains machine-readable information about our platform, data handling practices, and compliance standards.' },
+    'terms': { title: 'TERMS OF SERVICE & NDA', content: '<strong>1. Non-Disclosure & Idea Protection:</strong> By using IdeaventureX, both Problem Owners and Developers agree to mutual Non-Disclosure obligations. All proprietary concepts shared within matched groups remain strictly confidential and the intellectual property of the Problem Owner unless formally transferred.<br><br><strong>2. User Conduct:</strong> Users must provide accurate skill sets. Any attempt to scrape, copy, or bypass the platform to steal ideas will result in a permanent ban and potential legal action under the governing Intellectual Property laws.<br><br><strong>3. Liability:</strong> IdeaventureX acts solely as a matching mediator. We ensure verified connections but are not liable for external contracts signed between matched parties.' },
+    'privacy': { title: 'PRIVACY POLICY', content: '<strong>1. Data Collection:</strong> We collect essential data (skills, email, usage analytics) to provide accurate matchmaking. We do not sell your personal data to third parties. We use industry-standard encryption for all data at rest and in transit.<br><br><strong>2. Intellectual Property Privacy:</strong> Information posted in the "Live Problems" section remains obfuscated to unverified users or standard visitors. Only strictly necessary surface data is public for SEO purposes.<br><br><strong>3. Your Rights:</strong> You have the right to request full deletion of your account and associated data. However, records of accepted NDA contracts may be retained for legal compliance.' },
+    'privacy-choices': { title: 'PRIVACY CHOICES', content: 'Manage your privacy preferences. Control what data you share, opt out of data collection, and customize your experience on IdeaventureX.' },
+    'ilms': { title: 'ILMS.TXT', content: 'Information Location and Management Standards. This page contains machine-readable information about our platform, data handling practices, and compliance standards for AI indexing.' },
     'advertise': { title: 'ADVERTISE WITH US', content: 'Reach 1.8K+ elite developers and problem solvers. Promote your tools, APIs, and services to the most active innovators in our network.' },
-    'contact': { title: 'CONTACT US', content: 'Have questions or feedback? Reach out to us at hello@problemidea.com. Our team typically responds within 24 hours.' },
-    'twitter': { title: 'TWITTER', content: 'Follow us on Twitter @problemidea for the latest updates, featured problems, and community highlights. Join the conversation!' },
+    'contact': { title: 'CONTACT US', content: 'Have questions or feedback? Reach out to us at hello@ideaventurex.com. Our team typically responds within 24 hours.' },
+    'twitter': { title: 'TWITTER', content: 'Follow us on Twitter @IdeaventureX for the latest updates, featured problems, and community highlights. Join the conversation!' },
     'linkedin': { title: 'LINKEDIN', content: 'Connect with us on LinkedIn. Follow our company page for professional updates, success stories, and networking opportunities.' }
 };
 
@@ -319,9 +319,9 @@ window.onscroll = function() {
 function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
 function toggleTheme() {
-    document.body.classList.toggle('light-mode');
+    document.body.classList.toggle('dark-mode');
     const icon = document.querySelector('.theme-toggle i');
-    icon.className = document.body.classList.contains('light-mode') ? 'fas fa-sun' : 'fas fa-moon';
+    icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
 }
 
 function logout() {
@@ -405,7 +405,7 @@ function demoLogin() {
     document.getElementById('profileBadge').style.display = 'flex';
     isLoggedIn = true;
     showToast('WELCOME BACK!');
-    switchPage('dashboard');
+    window.location.href = 'dashboard.html';
 }
 
 function demoSignup() {
@@ -418,7 +418,7 @@ function demoSignup() {
     document.getElementById('profileType').textContent = role.includes('OWNER') ? 'OWNER' : 'DEVELOPER';
     isLoggedIn = true;
     showToast('ACCOUNT CREATED!');
-    switchPage('dashboard');
+    window.location.href = 'dashboard.html';
 }
 
 function adminLogin() {
