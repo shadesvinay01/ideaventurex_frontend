@@ -98,6 +98,12 @@ elseif ($action === 'login') {
         $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Block OAuth users from using password login
+        if ($user && !empty($user['is_oauth']) && $user['is_oauth'] == 1) {
+            die(json_encode(["status" => "error", "message" => "This account uses Google/Apple Sign-In. Please use that button instead."]));
+        }
+        
         $valid = $user && password_verify($password, $user['password_hash']);
     }
     
@@ -106,8 +112,9 @@ elseif ($action === 'login') {
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $user['role'];
         $_SESSION['user_email'] = $user['email'];
+        $_SESSION['is_subscribed'] = $user['is_subscribed'];
         
-        $response = ["status" => "success", "message" => "Login successful", "role" => $user['role'], "name" => $user['name']];
+        $response = ["status" => "success", "message" => "Login successful", "role" => $user['role'], "is_subscribed" => $user['is_subscribed']];
     } else {
         $response = ["status" => "error", "message" => "Invalid credentials or account does not exist"];
     }
@@ -126,7 +133,8 @@ elseif ($action === 'check_session') {
             "user" => [
                 "id" => $_SESSION['user_id'],
                 "name" => $_SESSION['user_name'],
-                "role" => $_SESSION['user_role'],
+                "role" => $_SESSION['user_role'] ?? 'owner',
+                "is_subscribed" => $_SESSION['is_subscribed'] ?? 0,
                 "email" => $_SESSION['user_email']
             ]
         ];

@@ -109,12 +109,11 @@
                 <button class="btn-primary" onclick="openModal('signup')">JOIN</button>
             </div>
             <div class="profile-badge" id="profileBadge" onclick="toggleLogout(event)">
-                <div class="avatar">AK</div>
-                <span id="profileType">BUILDER</span>
-                <span class="notification-badge">3</span>
+                <div class="avatar" id="profileAvatar">--</div>
+                <span id="profileType">USER</span>
+                <span class="notification-badge" id="notifBadge" style="display:none; position:absolute; top:-5px; right:-5px; background:#ff4757; color:white; border-radius:50%; width:18px; height:18px; font-size:10px; align-items:center; justify-content:center;">0</span>
                 <div class="logout-dropdown" id="logoutDropdown" onclick="event.stopPropagation()">
                     <a href="dashboard.html" onclick="event.stopPropagation();">📊 DASHBOARD</a>
-                    <a onclick="openEditProfileModal(); event.stopPropagation();">✏️ EDIT PROFILE</a>
                     <a onclick="logout(); event.stopPropagation();">🚪 LOGOUT</a>
                 </div>
             </div>
@@ -368,6 +367,37 @@
                 <div id="storyModalBody" style="color: var(--text-secondary); line-height: 1.8; font-size: 16px;">
                     Story content goes here...
                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Idea Detail Modal -->
+    <div class="modal" id="ideaDetailModal">
+        <div class="modal-content" style="max-width: 680px; border-radius: 24px; padding: 0; overflow: hidden;">
+            <div id="ideaDetailBanner" style="min-height: 160px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-3)); display: flex; align-items: flex-end; padding: 30px; position: relative;">
+                <span class="close" onclick="closeModal('ideaDetailModal')" style="color:white; position:absolute; top:15px; right:20px; font-size:28px; cursor:pointer;">&times;</span>
+                <div>
+                    <div id="ideaDetailBadges" style="display:flex; gap:8px; margin-bottom:12px;"></div>
+                    <h2 id="ideaDetailTitle" style="color:white; font-size:22px; line-height:1.3;"></h2>
+                </div>
+            </div>
+            <div style="padding: 30px;">
+                <p id="ideaDetailDesc" style="color:var(--text-secondary); line-height:1.8; font-size:15px; margin-bottom:25px;"></p>
+                <div style="display:flex; gap:15px; margin-bottom:25px; flex-wrap:wrap;">
+                    <div style="background:rgba(99,102,241,0.08); border-radius:12px; padding:15px 20px; flex:1; min-width:130px;">
+                        <div style="font-size:11px; color:var(--text-secondary); margin-bottom:5px; font-weight:600;">POSTED BY</div>
+                        <div id="ideaDetailOwner" style="font-weight:600; color:var(--text-primary);"></div>
+                    </div>
+                    <div style="background:rgba(99,102,241,0.08); border-radius:12px; padding:15px 20px; flex:1; min-width:130px;">
+                        <div style="font-size:11px; color:var(--text-secondary); margin-bottom:5px; font-weight:600;">LOOKING FOR</div>
+                        <div id="ideaDetailIntent" style="font-weight:600; color:var(--text-primary);"></div>
+                    </div>
+                    <div style="background:rgba(99,102,241,0.08); border-radius:12px; padding:15px 20px; flex:1; min-width:130px;">
+                        <div style="font-size:11px; color:var(--text-secondary); margin-bottom:5px; font-weight:600;">VIEWS</div>
+                        <div id="ideaDetailViews" style="font-weight:600; color:var(--text-primary);"></div>
+                    </div>
+                </div>
+                <div id="ideaDetailActions" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;"></div>
             </div>
         </div>
     </div>

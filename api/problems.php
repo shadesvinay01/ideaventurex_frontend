@@ -103,4 +103,43 @@ elseif ($action === 'update_idea') {
         echo json_encode(["status" => "error", "message" => "Failed to update idea."]);
     }
 }
+
+elseif ($action === 'get_detail') {
+    $id = $_GET['id'] ?? 0;
+    if (!$id) die(json_encode(["status" => "error", "message" => "ID required"]));
+
+    $stmt = $conn->prepare("SELECT p.*, u.name as owner_name, u.role as owner_role, u.skills as owner_skills FROM problems p JOIN users u ON p.user_id = u.id WHERE p.id = ? AND p.status = 'published'");
+    $stmt->execute([$id]);
+    $p = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$p) die(json_encode(["status" => "error", "message" => "Problem not found"]));
+
+    $alreadyRequested = false;
+    $isOwner = false;
+    if ($isLoggedIn) {
+        $r = $conn->prepare("SELECT id FROM idea_requests WHERE problem_id = ? AND requester_id = ?");
+        $r->execute([$id, $_SESSION['user_id']]);
+        $alreadyRequested = $r->rowCount() > 0;
+        $isOwner = $p['user_id'] == $_SESSION['user_id'];
+    }
+
+    echo json_encode([
+        "status" => "success",
+        "data" => [
+            "id" => $p['id'],
+            "title" => $p['title'],
+            "description" => $p['description'],
+            "category" => strtoupper($p['category']),
+            "intent" => strtoupper($p['intent']),
+            "views" => $p['views'],
+            "owner_name" => $p['owner_name'],
+            "owner_role" => $p['owner_role'],
+            "owner_skills" => $p['owner_skills'],
+            "already_requested" => $alreadyRequested,
+            "is_owner" => $isOwner,
+            "is_logged_in" => $isLoggedIn
+        ]
+    ]);
+}
 ?>
+

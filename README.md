@@ -102,3 +102,43 @@ The platform now uses a **Strict Authentication Flow** that automatically forces
 5. To test verification logic (once your SMTP links are built), you will create an endpoint in `api/auth.php` that flips `email_verified = 1` in the database.
 
 > **Production Warning:** Do NOT deploy temporary scripts like `temp_migration.php` or `setup_db.php` to a live server after running them once. Delete them immediately after scaffolding the database to prevent unauthorized mock data injection or schema resets.
+
+---
+
+## 6. Request & Notification System
+
+### How the Flow Works
+1. **Browse Ideas** — Any logged-in user clicks an idea card → a popup modal opens with full description, owner info, and a Request button.
+2. **Send Request** — The logged-in user sends a collaboration request with an optional intro message. The idea owner receives an immediate notification in the **Notifications** tab on their Dashboard.
+3. **Approve or Reject** — The idea owner sees APPROVE / REJECT buttons directly on the notification card. Approving reveals the owner's email + phone contact to the requester.
+4. **Requester Notified** — The requester sees the approval in their **Notifications** tab with the owner's contact info card (email + phone_contact).
+
+### Badge Counter
+- The bell icon badge on the Dashboard sidebar shows a count of unread notifications.
+- Opening the Notifications tab auto-marks all as read.
+
+### API Endpoints
+- `api/requests.php?action=send` (POST) — Submit a request
+- `api/requests.php?action=incoming` (GET) — List requests received by owner
+- `api/requests.php?action=outgoing` (GET) — List requests sent by developer
+- `api/requests.php?action=approve` (POST, `request_id`) — Approve and notify
+- `api/requests.php?action=reject` (POST, `request_id`) — Reject and notify
+
+---
+
+## 7. Avatar System
+
+- No image upload is required or supported. Users choose from **5 male + 5 female emoji avatars**.
+- Open Dashboard > Edit Profile > scroll to "Choose Avatar" to see the selection grid.
+- Default is no avatar (initials are shown instead).
+- The selected avatar appears in the dashboard profile header.
+- The avatar key (e.g., `m1`, `f3`) is saved in the `users.avatar` column.
+
+---
+
+## 8. Google / Apple OAuth and Passwords
+- OAuth users are flagged with `is_oauth = TRUE` in the database.
+- Password login is blocked for OAuth users. The backend returns an error: `Use Google/Apple to sign in`.
+- Google OAuth provides: `name`, `email`, `profile picture URL` (picture is ignored, we use avatar system), and a unique `uid`.
+- No permanent password is stored for OAuth users.
+- The `phone_contact` field (optional) allows owners to share a phone number revealed to approved collaborators.

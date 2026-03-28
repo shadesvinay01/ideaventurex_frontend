@@ -30,8 +30,9 @@ const pageContents = {
     'linkedin': { title: 'LINKEDIN', content: 'Connect with us on LinkedIn. Follow our company page for professional updates, success stories, and networking opportunities.' }
 };
 
-let userType = 'owner';
 let isLoggedIn = false;
+let userType = 'owner'; // Default
+let isSubscribed = false;
 
 // Mobile menu toggle
 function toggleMobileMenu() {
@@ -101,16 +102,85 @@ function checkSession() {
     .then(data => {
         if (data.status === 'success' && data.logged_in) {
             isLoggedIn = true;
+            isSubscribed = data.user.is_subscribed == 1;
             document.getElementById('authButtons').style.display = 'none';
             document.getElementById('profileBadge').style.display = 'flex';
             document.getElementById('profileType').textContent = data.user.role.toUpperCase();
+            loadNotifCount();
+            updateSubscribeButtons();
         }
     });
 }
 
-// Subscribe alert function
+function updateSubscribeButtons() {
+    const btns = document.querySelectorAll('.subscribe-btn');
+    btns.forEach(btn => {
+        if (isLoggedIn && isSubscribed) {
+            btn.innerHTML = '<i class="fas fa-bell"></i> SUBSCRIBED';
+            btn.classList.add('active');
+            btn.style.background = 'linear-gradient(135deg, var(--gradient-1), var(--gradient-2))';
+            btn.style.color = 'white';
+        } else {
+            btn.innerHTML = '<i class="far fa-bell"></i> SUBSCRIBE';
+            btn.classList.remove('active');
+            btn.style.background = 'rgba(255,255,255,0.05)';
+            btn.style.color = 'var(--text-primary)';
+        }
+    });
+}
+
+function loadNotifCount() {
+    fetch('api/dashboard.php?action=notif_count')
+    .then(r => r.json())
+    .then(d => {
+        const badge = document.getElementById('notifBadge');
+        if (!badge) return;
+        if (d.count > 0) {
+            badge.textContent = d.count;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    })
+    .catch(() => {});
+}
+
+// Subscribe toggle function
 function subscribeAlert() {
-    alert('Please login or sign up to subscribe');
+    if (!isLoggedIn) {
+        showToast('Please login to subscribe');
+        openAuthModal('login');
+        return;
+    }
+
+    const newStatus = isSubscribed ? 0 : 1;
+    const fd = new FormData();
+    fd.append('action', 'update_profile');
+    // We need current profile values to not overwrite them, but dashboard.php's update_profile expects them.
+    // However, we can just send the change and have dashboard.php handle partial updates or we fetch them first.
+    // For this context, let's assume update_profile handles what it gets.
+    // Actually, dashboard.php REQUIRES name/role/etc.
+    
+    // Better: call a specific toggle action in dashboard.php or just use the dashboard's profile update if we have data.
+    // Let's modify dashboard.php to support a simpler 'toggle_subscription' action or handle partials.
+    
+    // Simple approach: Use the existing update_profile but we need the data.
+    // To keep it clean, I'll add a 'toggle_subscription' to dashboard.php.
+    
+    fetch('api/dashboard.php?action=update_profile&toggle_sub=1', {
+        method: 'POST',
+        body: new URLSearchParams({ is_subscribed: newStatus })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.status === 'success') {
+            isSubscribed = newStatus === 1;
+            updateSubscribeButtons();
+            showToast(isSubscribed ? 'SUBSCRIBED TO DAILY DIGEST' : 'UNSUBSCRIBED');
+        } else {
+            showToast(d.message);
+        }
+    });
 }
 
 // Filter functions for home page
@@ -179,10 +249,87 @@ function loadProblems() {
 
 function createProblemCard(p) {
     if (p.locked) {
-        return `<div class="problem-card"><div class="card-badges"><span class="badge industry">${p.category}</span><span class="badge intent">${p.intent}</span><span class="badge status">LIVE</span></div><div class="problem-title">${p.title}</div><div class="blur-container"><div class="blur-content problem-desc">${p.desc}</div><div class="unlock-overlay" onclick="openAuthModal('login')">LOGIN TO VIEW</div></div><div class="card-footer"><span class="view-count"><i class="far fa-eye"></i> ${p.views}</span><div><span class="user-avatar-sm">${p.user}</span> <span class="timestamp">${p.time}</span></div></div></div>`;
+        return `<div class="problem-card">
+            <div class="card-badges"><span class="badge industry">${p.category}</span><span class="badge intent">${p.intent}</span><span class="badge status">LIVE</span></div>
+            <div class="problem-title">${p.title}</div>
+            <div class="blur-container"><div class="blur-content problem-desc">${p.desc}</div><div class="unlock-overlay" onclick="openAuthModal('login')">LOGIN TO VIEW</div></div>
+            <div class="card-footer"><span class="view-count"><i class="far fa-eye"></i> ${p.views}</span><div><span class="user-avatar-sm">${p.user}</span> <span class="timestamp">${p.time}</span></div></div>
+        </div>`;
     } else {
-        return `<div class="problem-card"><div class="card-badges"><span class="badge industry">${p.category}</span><span class="badge intent">${p.intent}</span><span class="badge status">LIVE</span></div><div class="problem-title">${p.title}</div><div class="problem-desc">${p.desc}</div><div class="card-footer"><button class="interest-btn" onclick="showToast('INTEREST SENT')">REQUEST</button><span class="view-count"><i class="far fa-eye"></i> ${p.views} <span class="timestamp">${p.time}</span></span></div></div>`;
+        return `<div class="problem-card" onclick="openIdeaDetail(${p.id})" style="cursor:pointer;">
+            <div class="card-badges"><span class="badge industry">${p.category}</span><span class="badge intent">${p.intent}</span><span class="badge status">LIVE</span></div>
+            <div class="problem-title">${p.title}</div>
+            <div class="problem-desc">${p.desc}</div>
+            <div class="card-footer"><span class="interest-btn">View Details</span><span class="view-count"><i class="far fa-eye"></i> ${p.views} <span class="timestamp">${p.time}</span></span></div>
+        </div>`;
     }
+}
+
+function openIdeaDetail(id) {
+    fetch(`api/problems.php?action=get_detail&id=${id}`)
+    .then(r => r.json())
+    .then(d => {
+        if (d.status !== 'success') return showToast(d.message);
+        const p = d.data;
+        
+        document.getElementById('ideaDetailTitle').textContent = p.title;
+        document.getElementById('ideaDetailDesc').textContent = p.description;
+        document.getElementById('ideaDetailOwner').textContent = p.owner_name;
+        document.getElementById('ideaDetailIntent').textContent = p.intent;
+        document.getElementById('ideaDetailViews').textContent = p.views + ' views';
+        document.getElementById('ideaDetailBadges').innerHTML = `
+            <span style="background:rgba(255,255,255,0.2); color:white; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600;">${p.category}</span>
+            <span style="background:rgba(255,255,255,0.2); color:white; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600;">${p.intent}</span>
+        `;
+        
+        // Build action area
+        const actions = document.getElementById('ideaDetailActions');
+        if (!p.is_logged_in) {
+            actions.innerHTML = `<button class="btn-primary" style="padding:14px 30px; border-radius:30px; border:none; background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); color:white; cursor:pointer; font-weight:bold; letter-spacing:1px;" onclick="closeModal('ideaDetailModal'); openAuthModal('login')">LOGIN TO REQUEST</button>`;
+        } else if (p.is_owner) {
+            actions.innerHTML = `<span style="color:var(--text-secondary); font-size:14px;"><i class="fas fa-info-circle"></i> This is your own idea</span>`;
+        } else if (p.already_requested) {
+            actions.innerHTML = `<span style="color:#2ed573; font-size:14px; font-weight:600;"><i class="fas fa-check-circle"></i> Request already sent — awaiting owner response</span>`;
+        } else {
+            actions.innerHTML = `
+                <input type="text" id="requestMsgInput" placeholder="Introduce yourself... (optional)" style="flex:1; padding:12px 20px; border:1px solid var(--border-color); border-radius:30px; background:rgba(255,255,255,0.05); color:var(--text-primary); font-family:inherit; min-width:200px;">
+                <button class="btn-primary" style="padding:14px 25px; border-radius:30px; border:none; background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); color:white; cursor:pointer; font-weight:bold; letter-spacing:1px; white-space:nowrap;" onclick="sendRequest(${p.id})">SEND REQUEST</button>
+            `;
+        }
+        
+        openModal('ideaDetailModal');
+    });
+}
+
+function sendRequest(problemId) {
+    const msgInput = document.getElementById('requestMsgInput');
+    const message = msgInput ? msgInput.value : '';
+    
+    const fd = new FormData();
+    fd.append('action', 'send');
+    fd.append('problem_id', problemId);
+    fd.append('message', message);
+    
+    fetch('api/requests.php', {method: 'POST', body: fd})
+    .then(r => r.json())
+    .then(d => {
+        showToast(d.message);
+        if (d.status === 'success') {
+            closeModal('ideaDetailModal');
+        }
+    });
+}
+
+// Avatar helper — returns initials div or avatar emoji
+function getAvatarDisplay(avatarKey, name) {
+    const avatars = {
+        m1: '👨', m2: '🧑', m3: '👨‍💼', m4: '👨‍💻', m5: '🧔',
+        f1: '👩', f2: '👩‍💼', f3: '👩‍💻', f4: '🧕', f5: '💁‍♀️'
+    };
+    if (avatarKey && avatars[avatarKey]) {
+        return `<span style="font-size:40px;">${avatars[avatarKey]}</span>`;
+    }
+    return `<span style="font-size:32px; font-weight:bold; color:white;">${(name || 'U').substring(0,2).toUpperCase()}</span>`;
 }
 
 function loadStories() {
@@ -493,8 +640,10 @@ function demoLogin() {
             document.getElementById('profileBadge').style.display = 'flex';
             document.getElementById('profileType').textContent = d.role.toUpperCase();
             isLoggedIn = true;
+            isSubscribed = d.is_subscribed == 1;
             showToast('WELCOME BACK!');
             loadProblems(); // Unlock problems
+            updateSubscribeButtons();
         } else {
             showToast(d.message);
         }

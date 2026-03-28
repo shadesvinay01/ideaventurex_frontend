@@ -56,11 +56,25 @@
             color: var(--text-primary);
             margin-top: 10px;
         }
-        @media(max-width: 768px) {
+        @media (max-width: 768px) {
             .dashboard-layout { flex-direction: column; }
             .dashboard-sidebar { width: 100%; height: auto; position: static; padding: 20px; border-bottom: 1px solid var(--border-color); border-right: none;}
             .dashboard-content { margin-left: 0; padding: 20px; }
         }
+        .avatar-opt {
+            font-size: 30px;
+            cursor: pointer;
+            border-radius: 50%;
+            padding: 8px;
+            transition: transform 0.2s ease, outline 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: rgba(99,102,241,0.06);
+        }
+        .avatar-opt:hover { transform: scale(1.2); }
     </style>
 </head>
 <body>
@@ -78,8 +92,8 @@
             <a class="sidebar-link active" onclick="switchDashTab('overview', this)"><i class="fas fa-home"></i> Overview</a>
             <a class="sidebar-link" onclick="switchDashTab('post-idea', this)"><i class="fas fa-plus-circle"></i> Post an Idea</a>
             <a class="sidebar-link" onclick="switchDashTab('my-ideas', this)"><i class="fas fa-lightbulb"></i> Posted Ideas</a>
-            <a class="sidebar-link" onclick="switchDashTab('liked-ideas', this)"><i class="fas fa-heart"></i> Ideas You Liked</a>
-            <a class="sidebar-link" onclick="switchDashTab('messages', this)"><i class="fas fa-comment"></i> Messages <span style="background:var(--gradient-3); color:white; border-radius:10px; padding:2px 8px; font-size:10px; margin-left:auto;">1</span></a>
+            <a class="sidebar-link" onclick="switchDashTab('liked-ideas', this)"><i class="fas fa-heart"></i> Ideas Liked / Sent</a>
+            <a class="sidebar-link" onclick="switchDashTab('notifications', this); loadNotifications();"><i class="fas fa-bell"></i> Notifications <span id="dashNotifBadge" style="display:none; background:var(--gradient-3); color:white; border-radius:10px; padding:2px 8px; font-size:10px; margin-left:auto;">0</span></a>
             
             <div style="margin-top: auto;">
                 <a class="sidebar-link" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back to Main Site</a>
@@ -160,25 +174,13 @@
             </div>
 
             <div id="liked-ideas-tab" class="dash-view" style="display: none;">
-                <h2 style="margin-bottom: 20px; color: var(--text-primary);">Ideas You Liked ❤️</h2>
-                <div style="background: var(--card-bg); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); display:flex; flex-wrap: wrap; justify-content:space-between; align-items:center; margin-bottom:15px; transition: 0.3s;" onmouseover="this.style.borderColor='var(--gradient-3)'" onmouseout="this.style.borderColor='var(--border-color)'">
-                    <div style="margin-bottom: 10px;">
-                        <h4 style="color: var(--text-primary); font-size: 18px;">Smart AgriTech Platform</h4>
-                        <p style="color:var(--text-secondary); font-size:13px; margin-top:8px;">Owner: Neha M. · Posted 2 days ago</p>
-                    </div>
-                    <button class="btn-primary" style="padding: 10px 20px; font-size:13px; border-radius: 30px; background: linear-gradient(135deg, var(--gradient-3), var(--gradient-1)); color: white; cursor: pointer; border: none;" onclick="switchDashTab('messages', document.querySelectorAll('.sidebar-link')[4])"><i class="fas fa-comment"></i> MESSAGE OWNER</button>
-                </div>
+                <h2 style="margin-bottom: 20px; color: var(--text-primary);">Requests Sent ❤️</h2>
+                <div id="outgoingRequestsList"><div style="color:var(--text-secondary);">Loading...</div></div>
             </div>
 
-            <div id="messages-tab" class="dash-view" style="display: none;">
-                <h2 style="margin-bottom: 20px; color: var(--text-primary);">Messages</h2>
-                <div style="background: var(--card-bg); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); display:flex; gap: 20px; align-items:center; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='var(--card-bg)'">
-                    <div class="avatar" style="width:60px; height:60px; min-width:60px; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size: 20px; font-weight: bold;">NM</div>
-                    <div style="flex:1;">
-                        <h4 style="color: var(--text-primary); font-size: 16px;">Neha M. <span style="font-size:11px; color:var(--text-secondary); float:right;">12:45 PM</span></h4>
-                        <p style="color:var(--text-secondary); font-size:14px; margin-top:8px;">Hi Alex, loved your profile! Are you interested in the AgriTech idea?</p>
-                    </div>
-                </div>
+            <div id="notifications-tab" class="dash-view" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: var(--text-primary);">Notifications 🔔</h2>
+                <div id="notificationsContainer"><div style="color:var(--text-secondary);">Loading...</div></div>
             </div>
 
         </div>
@@ -204,9 +206,39 @@
                 <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size:13px;">Skills (comma separated)</label>
                 <input type="text" id="editSkills" placeholder="React, Python, Figma" class="linked-in-input">
             </div>
+            <!-- Avatar Selector -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display:block; margin-bottom:12px; color:var(--text-secondary); font-size:13px;">Choose Avatar</label>
+                <div style="margin-bottom:8px; font-size:11px; color:var(--text-secondary);">Men</div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                    <span class="avatar-opt" data-key="m1" onclick="selectAvatar('m1')" title="m1">👨</span>
+                    <span class="avatar-opt" data-key="m2" onclick="selectAvatar('m2')" title="m2">🧑</span>
+                    <span class="avatar-opt" data-key="m3" onclick="selectAvatar('m3')" title="m3">👨‍💼</span>
+                    <span class="avatar-opt" data-key="m4" onclick="selectAvatar('m4')" title="m4">👨‍💻</span>
+                    <span class="avatar-opt" data-key="m5" onclick="selectAvatar('m5')" title="m5">🧔</span>
+                </div>
+                <div style="margin-bottom:8px; font-size:11px; color:var(--text-secondary);">Women</div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <span class="avatar-opt" data-key="f1" onclick="selectAvatar('f1')" title="f1">👩</span>
+                    <span class="avatar-opt" data-key="f2" onclick="selectAvatar('f2')" title="f2">👩‍💼</span>
+                    <span class="avatar-opt" data-key="f3" onclick="selectAvatar('f3')" title="f3">👩‍💻</span>
+                    <span class="avatar-opt" data-key="f4" onclick="selectAvatar('f4')" title="f4">🧕</span>
+                    <span class="avatar-opt" data-key="f5" onclick="selectAvatar('f5')" title="f5">💁‍♀️</span>
+                </div>
+                <input type="hidden" id="editAvatar">
+            </div>
             <div class="form-group" style="margin-bottom: 25px;">
                 <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size:13px;">LinkedIn URL</label>
                 <input type="text" id="editLinkedin" class="linked-in-input">
+            </div>
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size:13px;">Contact Phone (shown to approved partners)</label>
+                <input type="text" id="editPhoneContact" placeholder="+91 9876543210" class="linked-in-input">
+            </div>
+            <!-- Subscription Toggle -->
+            <div class="form-group" style="margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="editSubscribed" style="width:20px; height:20px; cursor:pointer;">
+                <label for="editSubscribed" style="color:var(--text-primary); font-size:14px; cursor:pointer; font-weight:500;">Subscribe to daily idea consolidated digest</label>
             </div>
             <button class="btn-primary" style="width: 100%; padding: 16px; border-radius: 30px; font-weight: bold; letter-spacing: 1px;" onclick="saveProfile()">SAVE CHANGES</button>
         </div>
@@ -248,6 +280,7 @@
             document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId + '-tab').style.display = 'block';
             if(element) element.classList.add('active');
+            if (tabId === 'liked-ideas') loadOutgoing();
         }
 
         function showDashToast(msg, type='success') {
@@ -313,7 +346,28 @@
                     document.getElementById('editRole').value = p.role || 'owner';
                     document.getElementById('editSkills').value = p.skills || '';
                     document.getElementById('editLinkedin').value = p.linkedin_url || '';
+                    document.getElementById('editPhoneContact').value = p.phone_contact || '';
+                    document.getElementById('editSubscribed').checked = p.is_subscribed == 1;
+                    if (p.avatar) {
+                        document.getElementById('editAvatar').value = p.avatar;
+                        selectAvatar(p.avatar, false); // highlight selected
+                    }
+                    
+                    // Update dashboard avatar display
+                    if (p.avatar) {
+                        const avatarEmojis = {m1:'👨',m2:'🧑',m3:'👨‍💼',m4:'👨‍💻',m5:'🧔',f1:'👩',f2:'👩‍💼',f3:'👩‍💻',f4:'🧕',f5:'💁‍♀️'};
+                        document.getElementById('dashAvatar').innerHTML = avatarEmojis[p.avatar] || (p.name||'U').substring(0,2).toUpperCase();
+                        document.getElementById('dashAvatar').style.fontSize = '36px';
+                    }
                 }
+                
+                // Load notification count for badge
+                fetch('api/dashboard.php?action=notif_count').then(r=>r.json()).then(d=>{
+                    if(d.count>0) {
+                        const nb = document.getElementById('dashNotifBadge');
+                        if(nb) { nb.textContent=d.count; nb.style.display='inline-block'; }
+                    }
+                }).catch(()=>{});
             });
         });
 
@@ -327,6 +381,9 @@
             fd.append('role', document.getElementById('editRole').value);
             fd.append('skills', document.getElementById('editSkills').value);
             fd.append('linkedin', document.getElementById('editLinkedin').value);
+            fd.append('avatar', document.getElementById('editAvatar').value);
+            fd.append('phone_contact', document.getElementById('editPhoneContact').value);
+            fd.append('is_subscribed', document.getElementById('editSubscribed').checked ? 1 : 0);
 
             fetch('api/dashboard.php?action=update_profile', { method: 'POST', body: fd })
             .then(r => r.json())
@@ -334,10 +391,115 @@
                 if(d.status === 'success') {
                     showDashToast('Profile updated successfully!');
                     closeModal('editProfileModal');
-                    setTimeout(() => location.reload(), 1000); // Reload to reflect changes elegantly
+                    setTimeout(() => location.reload(), 1000);
                 } else {
                     showDashToast(d.message || 'Error updating profile', 'error');
                 }
+            });
+        }
+
+        function selectAvatar(key, updateInput = true) {
+            document.querySelectorAll('.avatar-opt').forEach(el => {
+                el.style.outline = el.dataset.key === key ? '2px solid var(--gradient-1)' : 'none';
+                el.style.transform = el.dataset.key === key ? 'scale(1.3)' : 'scale(1)';
+            });
+            if (updateInput) document.getElementById('editAvatar').value = key;
+        }
+
+        function loadNotifications() {
+            const container = document.getElementById('notificationsContainer');
+            fetch('api/dashboard.php?action=notifications')
+            .then(r => r.json())
+            .then(d => {
+                // Mark as read
+                fetch('api/dashboard.php?action=mark_read', {method:'POST'});
+                const nb = document.getElementById('dashNotifBadge');
+                if(nb) nb.style.display = 'none';
+                
+                if (!d.data || d.data.length === 0) {
+                    container.innerHTML = '<div style="color:var(--text-secondary); text-align:center; padding:40px;">No notifications yet.</div>';
+                    return;
+                }
+                container.innerHTML = d.data.map(n => {
+                    let extraHtml = '';
+                    const isUnread = !n.is_read;
+                    const unreadStyle = isUnread ? 'border-left: 3px solid var(--gradient-1);' : '';
+                    
+                    // If it's an incoming request notification, show approve/reject
+                    if (n.type === 'new_request' && n.data) {
+                        extraHtml = `
+                            <div style="display:flex; gap:10px; margin-top:12px;">
+                                <button onclick="approveRequest(${n.data.request_id}, this)" style="padding:8px 20px; border-radius:20px; background:linear-gradient(135deg,#2ed573,#17c0eb); border:none; color:white; cursor:pointer; font-weight:bold; font-size:12px;">✓ APPROVE</button>
+                                <button onclick="rejectRequest(${n.data.request_id}, this)" style="padding:8px 20px; border-radius:20px; background:rgba(255,71,87,0.1); border:1px solid #ff4757; color:#ff4757; cursor:pointer; font-weight:bold; font-size:12px;">✗ REJECT</button>
+                            </div>`;
+                    }
+                    
+                    // If it's an approved notification, show contact info
+                    if (n.type === 'request_approved' && n.data) {
+                        extraHtml = `
+                            <div style="background:rgba(46,213,115,0.08); border-radius:12px; padding:15px; margin-top:12px; border:1px solid rgba(46,213,115,0.2);">
+                                <div style="font-size:12px; font-weight:600; color:#2ed573; margin-bottom:8px;">OWNER CONTACT INFO</div>
+                                <div style="font-size:14px; color:var(--text-primary);"><b>${n.data.owner_name}</b></div>
+                                <div style="font-size:13px; color:var(--text-secondary);">📧 ${n.data.owner_email}</div>
+                                ${n.data.owner_phone !== 'Not provided' ? `<div style="font-size:13px; color:var(--text-secondary);">📞 ${n.data.owner_phone}</div>` : ''}
+                            </div>`;
+                    }
+                    
+                    return `<div style="background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color); margin-bottom:12px; ${unreadStyle}">
+                        <p style="color:var(--text-primary); font-size:14px; margin:0;">${n.message}</p>
+                        <span style="color:var(--text-secondary); font-size:11px;">${new Date(n.created_at).toLocaleString()}</span>
+                        ${extraHtml}
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        function loadOutgoing() {
+            const container = document.getElementById('outgoingRequestsList');
+            fetch('api/requests.php?action=outgoing')
+            .then(r => r.json())
+            .then(d => {
+                if (!d.data || d.data.length === 0) {
+                    container.innerHTML = '<div style="color:var(--text-secondary); text-align:center; padding:40px;">You have not sent any requests yet. Browse ideas and click an idea card to send a request.</div>';
+                    return;
+                }
+                const statusColors = {pending:'#f9ca24', approved:'#2ed573', rejected:'#ff4757'};
+                container.innerHTML = d.data.map(r => `
+                    <div style="background:var(--card-bg); border-radius:16px; padding:20px; border:1px solid var(--border-color); margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+                            <div>
+                                <h4 style="color:var(--text-primary); font-size:16px; margin-bottom:5px;">${r.problem_title}</h4>
+                                <span style="color:var(--text-secondary); font-size:12px;">Owner: ${r.owner_name}</span>
+                            </div>
+                            <span style="padding:5px 15px; border-radius:20px; font-size:11px; font-weight:700; background:${statusColors[r.status]}22; color:${statusColors[r.status]};">${r.status.toUpperCase()}</span>
+                        </div>
+                        ${r.status === 'approved' ? `
+                        <div style="background:rgba(46,213,115,0.08); border-radius:12px; padding:12px 15px; margin-top:12px; border:1px solid rgba(46,213,115,0.2); font-size:13px;">
+                            <b style="color:#2ed573;">Contact Revealed:</b><br>
+                            📧 <span style="color:var(--text-primary);">${r.owner_email}</span>
+                            ${r.owner_phone ? `<br>📞 <span style="color:var(--text-primary);">${r.owner_phone}</span>` : ''}
+                        </div>` : ''}
+                    </div>`).join('');
+            });
+        }
+
+        function approveRequest(requestId, btn) {
+            const fd = new FormData();
+            fd.append('action', 'approve');
+            fd.append('request_id', requestId);
+            fetch('api/requests.php', {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
+                showDashToast(d.message);
+                if(d.status==='success') loadNotifications();
+            });
+        }
+
+        function rejectRequest(requestId, btn) {
+            const fd = new FormData();
+            fd.append('action', 'reject');
+            fd.append('request_id', requestId);
+            fetch('api/requests.php', {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
+                showDashToast(d.message);
+                if(d.status==='success') loadNotifications();
             });
         }
 
