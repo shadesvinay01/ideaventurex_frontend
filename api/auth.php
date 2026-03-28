@@ -62,6 +62,7 @@ if ($action === 'register') {
             $_SESSION['user_name'] = $name;
             $_SESSION['user_role'] = $role_val;
             $_SESSION['user_email'] = $email;
+            $_SESSION['is_subscribed'] = 0;
         }
         // Email users do NOT get auto-login session set, causing them to be forced to Verify.
         $response = ["status" => "success", "message" => "Account created successfully", "role" => $role_val, "name" => $name];
@@ -112,9 +113,17 @@ elseif ($action === 'login') {
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $user['role'];
         $_SESSION['user_email'] = $user['email'];
+        $_SESSION['user_avatar'] = $user['avatar'];
         $_SESSION['is_subscribed'] = $user['is_subscribed'];
         
-        $response = ["status" => "success", "message" => "Login successful", "role" => $user['role'], "is_subscribed" => $user['is_subscribed']];
+        $response = [
+            "status" => "success", 
+            "message" => "Login successful", 
+            "role" => $user['role'],
+            "name" => $user['name'],
+            "avatar" => $user['avatar'],
+            "is_subscribed" => $user['is_subscribed']
+        ];
     } else {
         $response = ["status" => "error", "message" => "Invalid credentials or account does not exist"];
     }
@@ -135,7 +144,8 @@ elseif ($action === 'check_session') {
                 "name" => $_SESSION['user_name'],
                 "role" => $_SESSION['user_role'] ?? 'owner',
                 "is_subscribed" => $_SESSION['is_subscribed'] ?? 0,
-                "email" => $_SESSION['user_email']
+                "email" => $_SESSION['user_email'],
+                "avatar" => $_SESSION['user_avatar'] ?? null
             ]
         ];
     } else {
@@ -198,8 +208,9 @@ elseif ($action === 'oauth_login') {
     $_SESSION['user_name'] = $userName;
     $_SESSION['user_role'] = $userRole;
     $_SESSION['user_email'] = $email;
+    $_SESSION['is_subscribed'] = $user['is_subscribed'] ?? 0;
     
-    $response = ["status" => "success", "message" => "OAuth Login successful", "role" => $userRole];
+    echo json_encode(["status" => "success", "user" => ["id" => $userId, "name" => $userName, "role" => $userRole, "is_subscribed" => $_SESSION['is_subscribed']]]);
 }
 
 elseif ($action === 'reset_password') {

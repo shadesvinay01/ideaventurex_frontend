@@ -106,6 +106,17 @@ function checkSession() {
             document.getElementById('authButtons').style.display = 'none';
             document.getElementById('profileBadge').style.display = 'flex';
             document.getElementById('profileType').textContent = data.user.role.toUpperCase();
+            
+            // Update Avatar Badge
+            const avatarEl = document.getElementById('profileAvatar');
+            if (data.user.avatar) {
+                avatarEl.innerHTML = data.user.avatar;
+                avatarEl.style.fontSize = '20px';
+            } else {
+                avatarEl.textContent = (data.user.name || 'U').substring(0, 2).toUpperCase();
+                avatarEl.style.fontSize = '14px';
+            }
+
             loadNotifCount();
             updateSubscribeButtons();
         }
@@ -486,9 +497,11 @@ function logout() {
         document.getElementById('profileBadge').style.display = 'none';
         document.getElementById('logoutDropdown')?.classList.remove('show');
         isLoggedIn = false;
+        isSubscribed = false;
         showToast('LOGGED OUT SUCCESSFULLY');
         switchPage('home');
         loadProblems(); // Reload to lock items
+        updateSubscribeButtons();
         document.getElementById('mobileMenu').style.display = 'none';
     });
 }
@@ -639,6 +652,17 @@ function demoLogin() {
             document.getElementById('authButtons').style.display = 'none';
             document.getElementById('profileBadge').style.display = 'flex';
             document.getElementById('profileType').textContent = d.role.toUpperCase();
+            
+            // Update Avatar Badge
+            const avatarEl = document.getElementById('profileAvatar');
+            if (d.avatar) {
+                avatarEl.innerHTML = d.avatar;
+                avatarEl.style.fontSize = '20px';
+            } else {
+                avatarEl.textContent = (d.name || 'U').substring(0, 2).toUpperCase();
+                avatarEl.style.fontSize = '14px';
+            }
+
             isLoggedIn = true;
             isSubscribed = d.is_subscribed == 1;
             showToast('WELCOME BACK!');

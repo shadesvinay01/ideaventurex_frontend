@@ -37,9 +37,13 @@ elseif ($action === 'update_profile') {
     $skills = $_POST['skills'] ?? '';
     $linkedin = $_POST['linkedin'] ?? '';
     $role = $_POST['role'] ?? 'owner';
+    $avatar = $_POST['avatar'] ?? null;
+    $phone_contact = $_POST['phone_contact'] ?? '';
+    $is_subscribed = isset($_POST['is_subscribed']) ? (int)$_POST['is_subscribed'] : 0;
+
     if (empty($role)) $role = 'owner';
 
-    // Handle partial update for the subscribe toggle from home page
+    // Handle partial update for the subscribe toggle from home page (uses toggle_sub query param)
     if (isset($_GET['toggle_sub'])) {
         $stmt = $conn->prepare("UPDATE users SET is_subscribed = ? WHERE id = ?");
         if ($stmt->execute([$is_subscribed, $user_id])) {
@@ -54,6 +58,7 @@ elseif ($action === 'update_profile') {
     $stmt = $conn->prepare("UPDATE users SET name = ?, skills = ?, linkedin_url = ?, role = ?, avatar = ?, phone_contact = ?, is_subscribed = ? WHERE id = ?");
     if ($stmt->execute([$name, $skills, $linkedin, $role, $avatar, $phone_contact, $is_subscribed, $user_id])) {
         $_SESSION['user_name'] = $name;
+        $_SESSION['user_avatar'] = $avatar;
         $_SESSION['is_subscribed'] = $is_subscribed;
         echo json_encode(["status" => "success", "message" => "Profile updated successfully"]);
     } else {
