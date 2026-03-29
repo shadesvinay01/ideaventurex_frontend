@@ -65,7 +65,11 @@ if ($action === 'register') {
             $_SESSION['is_subscribed'] = 0;
         }
         // Email users do NOT get auto-login session set, causing them to be forced to Verify.
-        $response = ["status" => "success", "message" => "Account created successfully", "role" => $role_val, "name" => $name];
+        $subject = "Welcome to IdeaventureX - Verify Your Email";
+        $body = "<h2>Welcome to IdeaventureX, $name!</h2><p>Thank you for joining our gated startup marketplace. We're excited to have you on board.</p><p>Please use the verification link on the website to complete your profile.</p><p>Regards,<br>Team IdeaventureX</p>";
+        send_custom_email($email, $subject, $body, 'no-reply@ideaventurex.com');
+        
+        $response = ["status" => "success", "message" => "Account created successfully. Check your email for verification.", "role" => $role_val, "name" => $name];
     } else {
         $response = ["status" => "error", "message" => "Failed to create account"];
     }
@@ -154,18 +158,24 @@ elseif ($action === 'check_session') {
 }
 
 elseif ($action === 'send_otp') {
-    $phone = $_POST['phone'] ?? '';
-    if(!empty($phone)) {
+    $target = $_POST['phone'] ?? '';
+    if(!empty($target)) {
         $otp = rand(100000, 999999);
-        
-        // Use PHP Session to hold the temporal OTP securely
         $_SESSION['auth_otp'] = $otp;
-        $_SESSION['auth_phone'] = $phone;
-        
-        // Simulating external SMS API response
-        $response = ["status" => "success", "message" => "OTP sent! (Demo OTP: $otp)"];
+        $_SESSION['auth_phone'] = $target;
+
+        if (filter_var($target, FILTER_VALIDATE_EMAIL)) {
+            // It's an email — send actual OTP
+            $subject = "Your Verification Code - IdeaventureX";
+            $body = "<h2>Verification Code</h2><p>Your OTP is: <strong>$otp</strong></p><p>Please use this code to verify your identity on IdeaventureX.</p>";
+            send_custom_email($target, $subject, $body, 'no-reply@ideaventurex.com');
+            $response = ["status" => "success", "message" => "Verification code sent to $target"];
+        } else {
+            // It's a phone — we still keep simulation for phone since SMS API isn't setup
+            $response = ["status" => "success", "message" => "OTP sent! (Trial OTP for phone: $otp)"];
+        }
     } else {
-        $response = ["status" => "error", "message" => "Phone number missing"];
+        $response = ["status" => "error", "message" => "Identifier (email/phone) missing"];
     }
 }
 

@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/unicornx/public_html/ideaventurex.com
+    - /bin/cp -R * $DEPLOYPATH

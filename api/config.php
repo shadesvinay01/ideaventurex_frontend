@@ -9,9 +9,9 @@ session_start();
 
 // Database configuration
 $db_host = 'localhost';
-$db_user = 'root';
-$db_pass = '';
-$db_name = 'ideaventurex_db';
+$db_user = 'root'; // CHANGE THIS TO YOUR CPANEL DB USER
+$db_pass = '';     // CHANGE THIS TO YOUR CPANEL DB PASSWORD
+$db_name = 'ideaventurex_db'; // CHANGE THIS TO YOUR CPANEL DB NAME
 
 try {
     // Initial connection to create DB if it doesn't exist
@@ -34,4 +34,14 @@ try {
 // Ensure all API output defaults to JSON
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *'); // Allow local CORS for testing
+
+// Common Email Sending Helper
+function send_custom_email($to, $subject, $body, $from = 'hello@ideaventurex.com') {
+    $headers = "From: IdeaventureX <$from>\r\n";
+    $headers .= "Reply-To: $from\r\n";
+    $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+    $headers .= "X-Mailer: PHP/" . phpversion();
+    
+    return @mail($to, $subject, $body, $headers);
+}
 ?>
