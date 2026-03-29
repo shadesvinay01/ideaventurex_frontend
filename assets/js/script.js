@@ -96,6 +96,67 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDate();
 });
 
+// ============================================================
+// GOOGLE SIGN-IN — Real implementation using Google Identity Services
+// The GIS library calls this function with a credential (JWT)
+// after the user selects their Google account.
+// ============================================================
+function handleGoogleCredential(response) {
+    // Decode the JWT payload (middle part, base64)
+    const parts = response.credential.split('.');
+    if (parts.length !== 3) {
+        showToast('Google Sign-In failed. Please try again.');
+        return;
+    }
+
+    let payload;
+    try {
+        payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    } catch (e) {
+        showToast('Google Sign-In error. Please try again.');
+        return;
+    }
+
+    const { email, name, sub: uid, picture } = payload;
+
+    if (!email || !uid) {
+        showToast('Unable to get Google account details. Please try again.');
+        return;
+    }
+
+    showToast('Signing in with Google...');
+
+    const fd = new FormData();
+    fd.append('action', 'oauth_login');
+    fd.append('provider', 'google');
+    fd.append('uid', uid);
+    fd.append('email', email);
+    fd.append('name', name || email.split('@')[0]);
+
+    fetch('api/auth.php', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+        if (d.status === 'success') {
+            closeModal('authModal');
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('profileBadge').style.display = 'flex';
+            document.getElementById('profileType').textContent = (d.user.role || 'owner').toUpperCase();
+
+            const avatarEl = document.getElementById('profileAvatar');
+            avatarEl.textContent = (d.user.name || name || 'G').substring(0, 2).toUpperCase();
+
+            isLoggedIn = true;
+            isSubscribed = d.user.is_subscribed == 1;
+            showToast('Welcome, ' + (d.user.name || name) + '! 🎉');
+            loadProblems();
+            updateSubscribeButtons();
+        } else {
+            showToast(d.message || 'Google Sign-In failed');
+        }
+    })
+    .catch(() => showToast('Network error during Google Sign-In'));
+}
+
 function checkSession() {
     fetch('api/auth.php?action=check_session')
     .then(r => r.json())

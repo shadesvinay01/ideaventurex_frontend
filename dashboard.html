@@ -132,16 +132,16 @@
             <div id="overview-tab" class="dash-view">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
                     <div class="stat-card-large" style="background: var(--card-bg); border-radius: 20px; padding: 30px; border: 1px solid var(--border-color); text-align: center; transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <h3 style="font-size: 40px; color: var(--gradient-1); margin-bottom: 10px;">2</h3>
+                        <h3 id="statIdeasPosted" style="font-size: 40px; color: var(--gradient-1); margin-bottom: 10px;">—</h3>
                         <p style="color: var(--text-secondary); font-size: 13px; font-weight: 600; letter-spacing: 1px;">IDEAS POSTED</p>
                     </div>
                     <div class="stat-card-large" style="background: var(--card-bg); border-radius: 20px; padding: 30px; border: 1px solid var(--border-color); text-align: center; transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <h3 style="font-size: 40px; color: var(--gradient-3); margin-bottom: 10px;">5</h3>
-                        <p style="color: var(--text-secondary); font-size: 13px; font-weight: 600; letter-spacing: 1px;">IDEAS LIKED (MATCHES)</p>
+                        <h3 id="statRequestsSent" style="font-size: 40px; color: var(--gradient-3); margin-bottom: 10px;">—</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; font-weight: 600; letter-spacing: 1px;">REQUESTS SENT</p>
                     </div>
                     <div class="stat-card-large" style="background: var(--card-bg); border-radius: 20px; padding: 30px; border: 1px solid var(--border-color); text-align: center; transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <h3 style="font-size: 40px; color: var(--gradient-2); margin-bottom: 10px;">12</h3>
-                        <p style="color: var(--text-secondary); font-size: 13px; font-weight: 600; letter-spacing: 1px;">PROFILE VIEWS</p>
+                        <h3 id="statMemberSince" style="font-size: 24px; color: var(--gradient-2); margin-bottom: 10px;">—</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; font-weight: 600; letter-spacing: 1px;">MEMBER SINCE</p>
                     </div>
                 </div>
             </div>
@@ -370,6 +370,24 @@
                         selectAvatar(p.avatar, false); // highlight selected
                     }
                 }
+
+                // Populate stats from real API data
+                document.getElementById('statIdeasPosted').textContent = d.data.ideas_posted ?? 0;
+
+                // Member since
+                if (d.data.profile && d.data.profile.created_at) {
+                    const dt = new Date(d.data.profile.created_at);
+                    document.getElementById('statMemberSince').textContent = dt.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+                } else {
+                    document.getElementById('statMemberSince').textContent = '2026';
+                }
+
+                // Requests sent count (real data from requests API)
+                fetch('api/requests.php?action=outgoing')
+                .then(r => r.json())
+                .then(rd => {
+                    document.getElementById('statRequestsSent').textContent = (rd.data || []).length;
+                }).catch(() => { document.getElementById('statRequestsSent').textContent = 0; });
                 
                 // Load notification count for badge
                 fetch('api/dashboard.php?action=notif_count').then(r=>r.json()).then(d=>{
@@ -514,17 +532,66 @@
         }
 
         function requestEmailVerification() {
-            showDashToast('Verification link sent via SendGrid API! (Stubbed for demo)');
-            // Wait visually then pseudo-verify
-            setTimeout(() => {
-                const b = document.getElementById('emailVerifyBadge');
-                b.innerText = 'Email Verified';
-                b.style.background = 'rgba(46, 213, 115, 0.1)';
-                b.style.color = '#2ed573';
-                b.style.borderColor = 'rgba(46, 213, 115, 0.3)';
-                b.onclick = null;
-                b.style.cursor = 'default';
-            }, 3000);
+            const badge = document.getElementById('emailVerifyBadge');
+            badge.textContent = 'Sending OTP...';
+            badge.style.cursor = 'default';
+
+            // Get user email from server
+            fetch('api/auth.php?action=check_session')
+            .then(r => r.json())
+            .then(s => {
+                if (!s.logged_in || !s.user) {
+                    badge.textContent = 'Email Not Verified [Verify]';
+                    badge.style.cursor = 'pointer';
+                    return;
+                }
+                const email = s.user.email;
+                const fd = new FormData();
+                fd.append('action', 'send_otp');
+                fd.append('email', email);
+                return fetch('api/auth.php', {method:'POST', body:fd})
+                .then(r => r.json())
+                .then(d => {
+                    if (d.status === 'success') {
+                        // Show inline OTP input
+                        badge.outerHTML = `
+                        <span style="display:inline-flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                            <input type="text" id="verifyOtpInline" placeholder="Enter OTP" maxlength="6"
+                                style="padding:4px 10px; border-radius:8px; border:1px solid #6366f1; background:transparent; color:var(--text-primary); width:100px; font-size:12px;">
+                            <button onclick="submitVerifyOtp('${email}')" style="padding:4px 14px; background:linear-gradient(135deg,#6366f1,#ec4899); border:none; border-radius:8px; color:white; font-size:11px; cursor:pointer; font-weight:600;">VERIFY</button>
+                            <span style="font-size:11px; color:#2ed573;">OTP sent to ${email}</span>
+                        </span>`;
+                    } else {
+                        badge.textContent = 'Failed - Click to retry';
+                        badge.style.cursor = 'pointer';
+                    }
+                });
+            });
+        }
+
+        function submitVerifyOtp(email) {
+            const otp = document.getElementById('verifyOtpInline')?.value.trim();
+            if (!otp) return showDashToast('Please enter the OTP', 'error');
+
+            const fd = new FormData();
+            fd.append('action', 'verify_otp');
+            fd.append('email', email);
+            fd.append('otp', otp);
+
+            fetch('api/auth.php', {method:'POST', body:fd})
+            .then(r => r.json())
+            .then(d => {
+                if (d.status === 'success') {
+                    // Replace input with verified badge
+                    const wrapper = document.getElementById('verifyOtpInline')?.parentElement;
+                    if (wrapper) {
+                        wrapper.outerHTML = `<span id="emailVerifyBadge" style="font-size:11px; padding:4px 12px; border-radius:20px; background:rgba(46,213,115,0.1); color:#2ed573; border:1px solid rgba(46,213,115,0.3);">Email Verified ✓</span>`;
+                    }
+                    showDashToast('Email verified successfully! ✓');
+                } else {
+                    showDashToast(d.message || 'Invalid OTP', 'error');
+                }
+            });
         }
 
         // New Idea Flows

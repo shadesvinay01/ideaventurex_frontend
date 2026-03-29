@@ -74,6 +74,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <!-- Progress Bar -->
@@ -420,10 +422,22 @@
                     <p>Enter your credentials to access your account</p>
                 </div>
                 <div class="social-auth">
-                    <button class="social-btn google" onclick="showToast('GOOGLE LOGIN - STUB')">
-                        <i class="fab fa-google"></i> Sign in with Google
-                    </button>
-                    <button class="social-btn apple" id="appleBtn" onclick="showToast('APPLE LOGIN - STUB')">
+                    <!-- Google One-Tap / Sign-In button - rendered by GIS library -->
+                    <div id="g_id_onload"
+                         data-client_id="GOOGLE_CLIENT_ID_HERE"
+                         data-callback="handleGoogleCredential"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-shape="rectangular"
+                         data-theme="outline"
+                         data-text="signin_with"
+                         data-size="large"
+                         data-logo_alignment="left"
+                         data-width="340">
+                    </div>
+                    <button class="social-btn apple" id="appleBtn" onclick="showToast('Apple Sign-In coming soon')" style="margin-top:8px;">
                         <i class="fab fa-apple"></i> Sign in with Apple
                     </button>
                 </div>
@@ -461,10 +475,17 @@
                     <p>Join the network to connect & innovate</p>
                 </div>
                 <div class="social-auth">
-                    <button class="social-btn google" onclick="showToast('GOOGLE SIGNUP - STUB')">
-                        <i class="fab fa-google"></i> Sign up with Google
-                    </button>
-                    <button class="social-btn apple" id="appleBtnSignup" onclick="showToast('APPLE SIGNUP - STUB')">
+                    <!-- Re-uses the same GIS button rendered in login view -->
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-shape="rectangular"
+                         data-theme="outline"
+                         data-text="signup_with"
+                         data-size="large"
+                         data-logo_alignment="left"
+                         data-width="340">
+                    </div>
+                    <button class="social-btn apple" id="appleBtnSignup" onclick="showToast('Apple Sign-In coming soon')" style="margin-top:8px;">
                         <i class="fab fa-apple"></i> Sign up with Apple
                     </button>
                 </div>
