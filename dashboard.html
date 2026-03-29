@@ -198,6 +198,10 @@
                 <input type="text" id="editName" class="linked-in-input">
             </div>
             <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size:13px;">Email Address <span style="color:#f9ca24; font-size:11px;">⚠ Changing this will require re-verification</span></label>
+                <input type="email" id="editEmail" class="linked-in-input" placeholder="your@email.com">
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size:13px;">Role</label>
                 <select id="editRole" class="linked-in-input">
                     <option value="owner">Problem Owner</option>
@@ -360,6 +364,7 @@
 
                     // Populate hidden default fields for modal
                     document.getElementById('editName').value = p.name || '';
+                    document.getElementById('editEmail').value = p.email || '';
                     document.getElementById('editRole').value = p.role || 'owner';
                     document.getElementById('editSkills').value = p.skills || '';
                     document.getElementById('editLinkedin').value = p.linkedin_url || '';
@@ -404,8 +409,10 @@
         }
 
         function saveProfile() {
+            const newEmail = document.getElementById('editEmail').value.trim();
             const fd = new FormData();
             fd.append('name', document.getElementById('editName').value);
+            fd.append('email', newEmail);
             fd.append('role', document.getElementById('editRole').value);
             fd.append('skills', document.getElementById('editSkills').value);
             fd.append('linkedin', document.getElementById('editLinkedin').value);
@@ -416,10 +423,25 @@
             fetch('api/dashboard.php?action=update_profile', { method: 'POST', body: fd })
             .then(r => r.json())
             .then(d => {
-                if(d.status === 'success') {
-                    showDashToast('Profile updated successfully!');
+                if (d.status === 'success') {
+                    showDashToast(d.message);
                     closeModal('editProfileModal');
-                    setTimeout(() => location.reload(), 1000);
+                    if (d.email_changed) {
+                        // Show OTP verifier inline for new email
+                        setTimeout(() => {
+                            const badge = document.getElementById('emailVerifyBadge');
+                            if (badge) {
+                                badge.outerHTML = `
+                                <span style="display:inline-flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                    <input type="text" id="verifyOtpInline" placeholder="Enter OTP sent to ${newEmail}" maxlength="6"
+                                        style="padding:4px 10px; border-radius:8px; border:1px solid #6366f1; background:transparent; color:var(--text-primary); width:160px; font-size:12px;">
+                                    <button onclick="submitVerifyOtp('${newEmail}')" style="padding:4px 14px; background:linear-gradient(135deg,#6366f1,#ec4899); border:none; border-radius:8px; color:white; font-size:11px; cursor:pointer; font-weight:600;">VERIFY</button>
+                                </span>`;
+                            }
+                        }, 500);
+                    } else {
+                        setTimeout(() => location.reload(), 1200);
+                    }
                 } else {
                     showDashToast(d.message || 'Error updating profile', 'error');
                 }
@@ -531,68 +553,69 @@
             });
         }
 
+        // Reusable: sends OTP via dedicated server endpoint
         function requestEmailVerification() {
             const badge = document.getElementById('emailVerifyBadge');
+            if (!badge) return;
             badge.textContent = 'Sending OTP...';
             badge.style.cursor = 'default';
+            badge.onclick = null;
 
-            // Get user email from server
-            fetch('api/auth.php?action=check_session')
-            .then(r => r.json())
-            .then(s => {
-                if (!s.logged_in || !s.user) {
-                    badge.textContent = 'Email Not Verified [Verify]';
-                    badge.style.cursor = 'pointer';
-                    return;
-                }
-                const email = s.user.email;
-                const fd = new FormData();
-                fd.append('action', 'send_otp');
-                fd.append('email', email);
-                return fetch('api/auth.php', {method:'POST', body:fd})
-                .then(r => r.json())
-                .then(d => {
-                    if (d.status === 'success') {
-                        // Show inline OTP input
-                        badge.outerHTML = `
-                        <span style="display:inline-flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                            <input type="text" id="verifyOtpInline" placeholder="Enter OTP" maxlength="6"
-                                style="padding:4px 10px; border-radius:8px; border:1px solid #6366f1; background:transparent; color:var(--text-primary); width:100px; font-size:12px;">
-                            <button onclick="submitVerifyOtp('${email}')" style="padding:4px 14px; background:linear-gradient(135deg,#6366f1,#ec4899); border:none; border-radius:8px; color:white; font-size:11px; cursor:pointer; font-weight:600;">VERIFY</button>
-                            <span style="font-size:11px; color:#2ed573;">OTP sent to ${email}</span>
-                        </span>`;
-                    } else {
-                        badge.textContent = 'Failed - Click to retry';
-                        badge.style.cursor = 'pointer';
-                    }
-                });
-            });
-        }
-
-        function submitVerifyOtp(email) {
-            const otp = document.getElementById('verifyOtpInline')?.value.trim();
-            if (!otp) return showDashToast('Please enter the OTP', 'error');
-
-            const fd = new FormData();
-            fd.append('action', 'verify_otp');
-            fd.append('email', email);
-            fd.append('otp', otp);
-
-            fetch('api/auth.php', {method:'POST', body:fd})
+            fetch('api/dashboard.php?action=resend_verification', { method: 'POST' })
             .then(r => r.json())
             .then(d => {
                 if (d.status === 'success') {
-                    // Replace input with verified badge
-                    const wrapper = document.getElementById('verifyOtpInline')?.parentElement;
-                    if (wrapper) {
-                        wrapper.outerHTML = `<span id="emailVerifyBadge" style="font-size:11px; padding:4px 12px; border-radius:20px; background:rgba(46,213,115,0.1); color:#2ed573; border:1px solid rgba(46,213,115,0.3);">Email Verified ✓</span>`;
-                    }
-                    showDashToast('Email verified successfully! ✓');
+                    badge.outerHTML = `
+                    <span id="verifyOtpWrapper" style="display:inline-flex; gap:8px; align-items:center; flex-wrap:wrap; margin-left:8px;">
+                        <input type="text" id="verifyOtpInline" placeholder="6-digit OTP" maxlength="6"
+                            style="padding:4px 10px; border-radius:8px; border:1px solid #6366f1; background:transparent; color:var(--text-primary); width:110px; font-size:12px;">
+                        <button onclick="submitVerifyOtp()" style="padding:4px 14px; background:linear-gradient(135deg,#6366f1,#ec4899); border:none; border-radius:8px; color:white; font-size:11px; cursor:pointer; font-weight:600;">VERIFY</button>
+                        <span style="font-size:11px; color:#2ed573;">OTP sent ✓</span>
+                        <a href="#" onclick="requestEmailVerification(); return false;" style="font-size:11px; color:#6366f1; text-decoration:underline;">Resend</a>
+                    </span>`;
+                } else if (d.status === 'info') {
+                    showDashToast(d.message);
                 } else {
-                    showDashToast(d.message || 'Invalid OTP', 'error');
+                    const b = document.getElementById('emailVerifyBadge');
+                    if (b) { b.textContent = 'Email Not Verified [Verify]'; b.style.cursor = 'pointer'; b.onclick = requestEmailVerification; }
+                    showDashToast(d.message || 'Failed to send OTP', 'error');
                 }
-            });
+            })
+            .catch(() => showDashToast('Network error. Please try again.', 'error'));
         }
+
+        function submitVerifyOtp(emailOverride) {
+            const otp = document.getElementById('verifyOtpInline')?.value.trim();
+            if (!otp || otp.length < 6) return showDashToast('Please enter the 6-digit OTP', 'error');
+
+            const doVerify = (email) => {
+                const fd = new FormData();
+                fd.append('action', 'verify_otp');
+                fd.append('email', email);
+                fd.append('otp', otp);
+                fetch('api/auth.php', { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(d => {
+                    if (d.status === 'success') {
+                        const w = document.getElementById('verifyOtpWrapper') || document.getElementById('verifyOtpInline')?.parentElement;
+                        if (w) w.outerHTML = `<span id="emailVerifyBadge" style="font-size:11px; padding:4px 12px; border-radius:20px; background:rgba(46,213,115,0.1); color:#2ed573; border:1px solid rgba(46,213,115,0.3);">Email Verified ✓</span>`;
+                        showDashToast('Email verified! ✓');
+                    } else {
+                        showDashToast(d.message || 'Invalid OTP. Please try again.', 'error');
+                    }
+                });
+            };
+
+            if (emailOverride) {
+                doVerify(emailOverride);
+            } else {
+                fetch('api/auth.php?action=check_session').then(r => r.json()).then(s => {
+                    if (s.logged_in && s.user?.email) doVerify(s.user.email);
+                    else showDashToast('Session expired. Please refresh.', 'error');
+                });
+            }
+        }
+
 
         // New Idea Flows
         function submitIdea(status) {
