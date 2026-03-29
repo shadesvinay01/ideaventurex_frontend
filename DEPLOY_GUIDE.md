@@ -1,43 +1,116 @@
-# IdeaventureX Live Deployment Guide 🚀
+# IdeaventureX — Complete Live Deployment Guide 🚀
 
-Follow these steps to make your site live on `ideaventurex.com`.
+## Overview
+- **Main Account:** `/home/unicornx/` on cPanel
+- **Target Domain:** `ideaventurex.com`
+- **Target Folder:** `/home/unicornx/public_html/ideaventurex.com`
+- **Repository:** `/home/unicornx/repositories/ideaventurex_frontend`
 
-## 1. Create MySQL Database (Manual Step)
-On cPanel, you must create the database container first:
-1.  Go to **MySQL® Database Wizard** in cPanel.
-2.  **Step 1:** Create a Database (e.g., `unicornx_ideaventurex`).
-3.  **Step 2:** Create a User (e.g., `unicornx_user`) and a strong password.
-4.  **Step 3:** Add User to Database. Select **"ALL PRIVILEGES"**.
-5.  **Copy these details** (DB Name, User, Password) into your local `api/config.php` before pushing to Git.
+---
 
-## 2. Connect Git to cPanel
-1.  **Commit & Push:** Ensure the [.cpanel.yml](file:///.cpanel.yml) file I created is committed and pushed to your GitHub repository.
-2.  In cPanel, go to **Git™ Version Control**.
-3.  Click **Manage** next to `ideaventurex_frontend`.
-4.  Click **Update from Remote**. This pulls the `.cpanel.yml` onto the server.
-5.  **Fixing "The system cannot deploy" error:**
-    - If it says "Uncommitted changes exist", you must reset the server's repo. Open **Terminal** in cPanel and run:
-      ```bash
-      cd /home/unicornx/repositories/ideaventurex_frontend
-      git reset --hard HEAD
-      ```
-6.  Once the error message disappears, click **Deploy HEAD Revision**.
+## STEP 1: Create MySQL Database on cPanel (One-Time)
 
-## 3. Path Verification (Multiple Domains)
-Your cPanel setup has multiple websites. I have configured the paths to ensure we **do not** overwrite your other sites:
-- **IdeaventureX Target:** `/home/unicornx/public_html/ideaventurex.com`
-- **Other Sites (Untouched):** `unicornxmedia.com` (root), `indiasgotunicorn.com`, etc.
+1. Go to **cPanel → MySQL® Database Wizard**
+2. **Create DB:** Name it `ideaventurex` → cPanel auto-prefixes → becomes `unicornx_ideaventurex`
+3. **Create User:** Name it `ivx_user` → becomes `unicornx_ivx_user` → set a strong password
+4. **Add User to DB → Grant ALL PRIVILEGES**
+5. **Copy these values into `api/config.php`:**
+   ```php
+   $db_user = 'unicornx_ivx_user';
+   $db_pass = 'YOUR_STRONG_PASSWORD';
+   $db_name = 'unicornx_ideaventurex';
+   ```
 
-## 3. Initialize Database Tables
-Once the site is live at `ideaventurex.com`, run the setup script:
-1.  Visit: `https://ideaventurex.com/api/setup_db.php`
-2.  You should see a message: `"DB setup complete!"`.
-3.  This will create all users, problems, and notification tables automatically.
+---
 
-## 4. Accounts & Verify
-- **Support Email:** Handled via `hello@ideaventurex.com`.
-- **OTP/Verification:** Sent via `no-reply@ideaventurex.com`.
-- **Admin Login:** Use `admin@ideaventurex.com` / `admin123` to access the admin panel and delete mock data once verified.
+## STEP 2: Update config.php and Push to GitHub
 
-> [!IMPORTANT]
-> Ensure your cPanel firewall allows outgoing SMTP/PHP mail. Most do by default.
+1. Edit `api/config.php` on your local PC with the live DB credentials above
+2. Commit and push:
+   ```bash
+   git add .
+   git commit -m "Add live DB credentials and deploy config"
+   git push origin main
+   ```
+
+---
+
+## STEP 3: Deploy from cPanel Git™ Version Control
+
+1. Go to **cPanel → Git™ Version Control**
+2. Find `ideaventurex_frontend` → click **Manage**
+3. Click **Update from Remote** (pulls your latest code including `.cpanel.yml`)
+4. Click **Deploy HEAD Commit**
+
+> **If you see "The system cannot deploy" error:**
+> Open cPanel **Terminal** and run:
+> ```bash
+> cd /home/unicornx/repositories/ideaventurex_frontend
+> git reset --hard HEAD
+> git pull origin main
+> ```
+> Then try **Deploy HEAD Commit** again.
+
+---
+
+## STEP 4: Initialize the Database (One-Time)
+
+Visit this **secure** URL (keep the token secret!):
+
+```
+https://ideaventurex.com/api/setup_db.php?setup_token=IVX_SETUP_2026_SECRET
+```
+
+You should see: `"status": "success", "message": "Database setup complete!"`
+
+> ⚠️ **Any other visitor who doesn't know the token gets a 403 Forbidden error.**
+> The token is defined in `setup_db.php` as `SETUP_TOKEN`. Change it after first use for extra security.
+
+---
+
+## STEP 5: Verify Email Accounts
+
+| Account | Purpose |
+|---|---|
+| `hello@ideaventurex.com` | Customer contact, Ad requests, Newsletter alerts |
+| `no-reply@ideaventurex.com` | OTP codes, system notifications, welcome emails |
+
+---
+
+## STEP 6: Admin Login
+
+- **URL:** `https://ideaventurex.com/admin.html`
+- **Email:** `admin@ideaventurex.com`
+- **Password:** `Idea@2026`
+
+> ⚠️ **Change the admin password immediately after first login!**
+> Go to Dashboard → Click your profile → Change Password.
+
+---
+
+## How Admin Changes Password
+
+1. Log in to the admin panel
+2. The Change Password API is at: `POST api/auth.php` with `action=change_password`
+3. Provide `current_password` and `new_password` (min 8 chars)
+
+---
+
+## Data Safety Guarantee
+
+- `setup_db.php` uses **`CREATE TABLE IF NOT EXISTS`** → **never drops existing tables**
+- Mock data is only seeded if problems table is **completely empty**
+- Every Git deploy only **copies** files — it **never touches the database**
+- Re-deploying or updating will **NEVER delete user data**
+
+---
+
+## Local Testing on XAMPP
+
+1. Start XAMPP (Apache + MySQL)
+2. Open browser: `http://localhost/ideaventurex_frontend/`
+3. First time only — visit: `http://localhost/ideaventurex_frontend/api/setup_db.php?setup_token=IVX_SETUP_2026_SECRET`
+4. Login with: `admin@ideaventurex.com` / `Idea@2026`
+
+> **Note:** On XAMPP, email (OTP) is not sent via `mail()`.
+> The API response will show the OTP directly in the toast message for local testing.

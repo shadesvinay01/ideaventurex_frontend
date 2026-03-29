@@ -616,56 +616,29 @@ function openEditProfileModal() {
     openModal('editProfile');
 }
 
-function detectInputType(input, iconId, mode) {
-    const val = input.value.trim();
-    const icon = document.getElementById(iconId);
-    if (!icon) return;
-
-    // Check if phone (starts with + or contains mostly numbers)
-    const isPhone = /^[\d+\-\s()]+$/.test(val) && val.replace(/\D/g, '').length >= 7;
-
-    if (isPhone) {
-        icon.className = 'fas fa-phone input-icon';
-        document.getElementById(mode + 'PasswordWrapper').style.display = 'none';
-        document.getElementById(mode + 'OtpGroup').style.display = 'flex';
-    } else {
-        icon.className = 'fas fa-envelope input-icon';
-        document.getElementById(mode + 'PasswordWrapper').style.display = 'flex';
-        document.getElementById(mode + 'OtpGroup').style.display = 'none';
-    }
-}
+// detectInputType removed — site is email-only now
 
 function demoLogin() {
-    const inputVal = document.getElementById('loginEmail').value.trim();
-    if (!inputVal) return showToast('Please enter Email or Phone');
-    
-    const isPhone = /^[\d+\-\s()]+$/.test(inputVal) && inputVal.replace(/\D/g, '').length >= 7;
-    
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass  = document.getElementById('loginPassword').value;
+
+    if (!email) return showToast('Please enter your email');
+    if (!pass)  return showToast('Please enter your password');
+
     const fd = new FormData();
     fd.append('action', 'login');
-    
-    if (isPhone) {
-        const otp = document.getElementById('loginOtpInput').value.trim();
-        if (!otp) return showToast('Please enter your OTP');
-        fd.append('phone', inputVal);
-        fd.append('otp', otp);
-    } else {
-        const pass = document.getElementById('loginPassword').value;
-        if (!pass) return showToast('Please enter your Password');
-        fd.append('email', inputVal);
-        fd.append('password', pass);
-    }
-    
+    fd.append('email', email);
+    fd.append('password', pass);
+
     fetch('api/auth.php', {method: 'POST', body: fd})
     .then(r => r.json())
     .then(d => {
-        if(d.status === 'success') {
+        if (d.status === 'success') {
             closeModal('authModal');
             document.getElementById('authButtons').style.display = 'none';
             document.getElementById('profileBadge').style.display = 'flex';
             document.getElementById('profileType').textContent = d.role.toUpperCase();
-            
-            // Update Avatar Badge
+
             const avatarEl = document.getElementById('profileAvatar');
             const avatarKey = d.avatar;
             if (avatarKey && (avatarKey.startsWith('m') || avatarKey.startsWith('f'))) {
@@ -681,8 +654,8 @@ function demoLogin() {
 
             isLoggedIn = true;
             isSubscribed = d.is_subscribed == 1;
-            showToast('WELCOME BACK!');
-            loadProblems(); // Unlock problems
+            showToast(d.message || 'WELCOME BACK!');
+            loadProblems();
             updateSubscribeButtons();
         } else {
             showToast(d.message);
@@ -691,74 +664,80 @@ function demoLogin() {
 }
 
 function demoSignup() {
-    const name = document.getElementById('signupName').value.trim();
-    const inputVal = document.getElementById('signupEmail').value.trim();
-    if (!inputVal || !name) return showToast('Please fill all required fields');
-    
-    const isPhone = /^[\d+\-\s()]+$/.test(inputVal) && inputVal.replace(/\D/g, '').length >= 7;
-    const role = document.getElementById('signupRole').value;
-    
+    const name  = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const pass  = document.getElementById('signupPassword').value;
+    const role  = document.getElementById('signupRole').value;
+
+    if (!name)  return showToast('Please enter your full name');
+    if (!email) return showToast('Please enter your email');
+    if (!pass)  return showToast('Please choose a password');
+    if (pass.length < 8) return showToast('Password must be at least 8 characters');
+
     const fd = new FormData();
     fd.append('action', 'register');
     fd.append('name', name);
+    fd.append('email', email);
+    fd.append('password', pass);
     fd.append('role', role);
 
-    if (isPhone) {
-        const otp = document.getElementById('signupOtpInput').value.trim();
-        if (!otp) return showToast('Please enter the OTP sent to your phone');
-        fd.append('phone', inputVal);
-        fd.append('otp', otp);
-    } else {
-        const pass = document.getElementById('signupPassword').value;
-        if (!pass) return showToast('Please choose a password');
-        fd.append('email', inputVal);
-        fd.append('password', pass);
-    }
-    
     fetch('api/auth.php', {method: 'POST', body: fd})
     .then(r => r.json())
     .then(d => {
-        if(d.status === 'success') {
-            document.getElementById('authButtons').style.display = 'none';
-            document.getElementById('profileBadge').style.display = 'flex';
-            document.getElementById('profileType').textContent = d.role ? d.role.toUpperCase() : role.toUpperCase();
-            isLoggedIn = true;
-            loadProblems();
-            
-            if (!isPhone) {
-                // Strict email verification redirect
-                toggleAuthView('verifyEmail');
-                showToast('ACCOUNT CREATED!');
-            } else {
-                closeModal('authModal');
-                showToast('ACCOUNT CREATED & VERIFIED!');
-            }
+        if (d.status === 'success') {
+            toggleAuthView('verifyEmail');
+            showToast('ACCOUNT CREATED! Welcome to IdeaventureX 🚀');
         } else {
             showToast(d.message);
         }
     });
 }
 
-function sendOTP(mode) {
-    const inputId = mode === 'signup' ? 'signupEmail' : 'loginEmail';
-    const phoneNum = document.getElementById(inputId).value.trim();
-    
-    if(!phoneNum) {
-        showToast('Please enter a phone number first');
-        return;
-    }
-    
+// sendOTP kept as stub (not used — email-only flow)
+function sendOTP(mode) { showToast('OTP via phone is disabled. Use email instead.'); }
+
+// Send OTP for password reset
+function sendForgotOtp() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    if (!email) return showToast('Please enter your email address');
+
     const fd = new FormData();
     fd.append('action', 'send_otp');
-    fd.append('phone', phoneNum);
-    
+    fd.append('email', email);
+
     fetch('api/auth.php', {method: 'POST', body: fd})
     .then(r => r.json())
     .then(d => {
         showToast(d.message);
-    })
-    .catch(() => {
-        showToast('FAILED TO SEND OTP');
+        if (d.status === 'success') {
+            document.getElementById('forgotOtpSection').style.display = 'block';
+            document.getElementById('forgotSendOtpBtn').style.display = 'none';
+        }
+    });
+}
+
+// Submit reset with OTP
+function submitResetPassword() {
+    const email    = document.getElementById('forgotEmail').value.trim();
+    const otp      = document.getElementById('forgotOtpInput').value.trim();
+    const newPass  = document.getElementById('forgotNewPassword').value;
+
+    if (!otp || !newPass) return showToast('Please fill all fields');
+    if (newPass.length < 8) return showToast('Password must be at least 8 characters');
+
+    const fd = new FormData();
+    fd.append('action', 'reset_password');
+    fd.append('email', email);
+    fd.append('otp', otp);
+    fd.append('new_password', newPass);
+
+    fetch('api/auth.php', {method: 'POST', body: fd})
+    .then(r => r.json())
+    .then(d => {
+        showToast(d.message);
+        if (d.status === 'success') {
+            toggleAuthView('login');
+        }
     });
 }
 
