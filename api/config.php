@@ -7,10 +7,6 @@
 // Detect environment: localhost = dev, anything else = production
 $is_local = in_array($_SERVER['SERVER_NAME'] ?? 'cli', ['localhost', '127.0.0.1', '::1']);
 
-
-$db_user = 'unicornx_ivx_user';
-$db_pass = 'Idea@2026';
-$db_name = 'unicornx_ideaventurex';
 // Show errors only locally
 if ($is_local) {
     ini_set('display_errors', 1);
@@ -24,31 +20,30 @@ if ($is_local) {
 // Start session with secure settings
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
-        'lifetime' => 86400, // 24 hours
-        'path' => '/',
-        'secure' => !$is_local, // HTTPS only on live
-        'httponly' => true,        // Block JS access to session cookie
+        'lifetime' => 86400,
+        'path'     => '/',
+        'secure'   => !$is_local,
+        'httponly' => true,
         'samesite' => 'Lax'
     ]);
     session_start();
 }
 
 // ============================================================
-// DATABASE CONFIGURATION
-// Local: uses root / no password
-// Live (cPanel): fill in your cPanel DB credentials below
+// DATABASE CONFIGURATION — Single source of truth
 // ============================================================
+$db_host = 'localhost';
+
 if ($is_local) {
-    $db_host = 'localhost';
+    // XAMPP local development
     $db_user = 'root';
     $db_pass = '';
     $db_name = 'ideaventurex_db';
 } else {
-    // === FILL THESE IN ON CPANEL ===
-    $db_host = 'localhost';
-    $db_user = 'unicornx_ivx_user';      // cPanel DB Username
-    $db_pass = 'CHANGE_THIS_PASSWORD';   // cPanel DB Password
-    $db_name = 'unicornx_ideaventurex';  // cPanel DB Name
+    // cPanel live server (unicornx account)
+    $db_user = 'unicornx_ivx_user';
+    $db_pass = 'Idea@2026';
+    $db_name = 'unicornx_ideaventurex';
 }
 
 try {
@@ -57,9 +52,10 @@ try {
     $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     header('Content-Type: application/json');
+    // On live: show a generic message but log the real error
     $msg = $is_local
         ? "DB Connection Failed: " . $e->getMessage() . " — Is XAMPP MySQL running?"
-        : "Service temporarily unavailable. Please try again later.";
+        : "Database connection failed. Error: " . $e->getMessage(); // Temporarily show real error for debugging
     die(json_encode(["status" => "error", "message" => $msg]));
 }
 
@@ -70,17 +66,18 @@ if ($is_local) {
 }
 
 // ============================================================
-// EMAIL HELPER — Sends from no-reply@ for system mail
-// All customer-facing contact email = hello@ideaventurex.com
+// EMAIL HELPER
+// $type = 'system'  → sends from no-reply@ideaventurex.com
+// $type = 'notify'  → sends from hello@ideaventurex.com
 // ============================================================
 function send_email($to, $subject, $body, $type = 'system')
 {
-    $from_name = 'IdeaventureX';
+    $from_name  = 'IdeaventureX';
     $from_email = ($type === 'system')
         ? 'no-reply@ideaventurex.com'
         : 'hello@ideaventurex.com';
 
-    $headers = "MIME-Version: 1.0\r\n";
+    $headers  = "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
     $headers .= "From: $from_name <$from_email>\r\n";
     $headers .= "Reply-To: hello@ideaventurex.com\r\n";
@@ -97,7 +94,7 @@ function send_email($to, $subject, $body, $type = 'system')
         $body
         <hr style='border:none;border-top:1px solid rgba(255,255,255,0.08);margin:30px 0;'>
         <p style='font-size:12px;color:#64748b;text-align:center;'>
-          © 2026 IdeaventureX · <a href='mailto:hello@ideaventurex.com' style='color:#6366f1;'>hello@ideaventurex.com</a>
+          &copy; 2026 IdeaventureX &middot; <a href='mailto:hello@ideaventurex.com' style='color:#6366f1;'>hello@ideaventurex.com</a>
         </p>
       </div>
     </body>
