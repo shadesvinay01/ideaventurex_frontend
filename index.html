@@ -115,8 +115,12 @@
                 <span id="profileType">USER</span>
                 <span class="notification-badge" id="notifBadge" style="display:none; position:absolute; top:-5px; right:-5px; background:#ff4757; color:white; border-radius:50%; width:18px; height:18px; font-size:10px; align-items:center; justify-content:center;">0</span>
                 <div class="logout-dropdown" id="logoutDropdown" onclick="event.stopPropagation()">
+                    <div style="padding:10px 16px 8px; border-bottom:1px solid var(--border-color); margin-bottom:4px;">
+                        <div id="dropdownName" style="font-weight:600; font-size:13px; color:var(--text-primary);">User</div>
+                        <div id="dropdownRole" style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px;">Owner</div>
+                    </div>
                     <a href="dashboard.html" onclick="event.stopPropagation();">📊 DASHBOARD</a>
-                    <a onclick="logout(); event.stopPropagation();">🚪 LOGOUT</a>
+                    <a onclick="logout(); event.stopPropagation();" style="color:#ff4757;">🚪 LOGOUT</a>
                 </div>
             </div>
             <div class="hamburger-menu" onclick="toggleMobileMenu()">☰</div>

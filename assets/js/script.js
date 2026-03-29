@@ -166,7 +166,13 @@ function checkSession() {
             isSubscribed = data.user.is_subscribed == 1;
             document.getElementById('authButtons').style.display = 'none';
             document.getElementById('profileBadge').style.display = 'flex';
-            document.getElementById('profileType').textContent = data.user.role.toUpperCase();
+            document.getElementById('profileType').textContent = data.user.name || data.user.role.toUpperCase();
+
+            // Populate dropdown header
+            const dn = document.getElementById('dropdownName');
+            const dr = document.getElementById('dropdownRole');
+            if (dn) dn.textContent = data.user.name || 'User';
+            if (dr) dr.textContent = data.user.role ? data.user.role.toUpperCase() : 'MEMBER';
             
             // Update Avatar Badge
             const avatarEl = document.getElementById('profileAvatar');
@@ -344,7 +350,7 @@ function createProblemCard(p) {
             <div class="card-badges"><span class="badge industry">${p.category}</span><span class="badge intent">${p.intent}</span><span class="badge status">LIVE</span></div>
             <div class="problem-title">${p.title}</div>
             <div class="problem-desc">${p.desc}</div>
-            <div class="card-footer"><span class="interest-btn">View Details</span><span class="view-count"><i class="far fa-eye"></i> ${p.views} <span class="timestamp">${p.time}</span></span></div>
+            <div class="card-footer"><button class="interest-btn" onclick="event.stopPropagation(); openIdeaDetail(${p.id})">View Details</button><span class="view-count"><i class="far fa-eye"></i> ${p.views} <span class="timestamp">${p.time}</span></span></div>
         </div>`;
     }
 }
@@ -581,12 +587,15 @@ function logout() {
 
 function switchPage(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-    document.getElementById(page + '-page').classList.add('active-page');
-    
+    const target = document.getElementById(page + '-page');
+    if (!target) return;
+    target.classList.add('active-page');
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Always go to top, not footer
+
     document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
     const links = document.querySelectorAll('.nav-links a');
-    for(let link of links) {
-        if(link.textContent.trim().toLowerCase() === page.toLowerCase()) {
+    for (let link of links) {
+        if (link.textContent.trim().toLowerCase() === page.toLowerCase()) {
             link.classList.add('active');
             break;
         }
@@ -698,7 +707,13 @@ function demoLogin() {
             closeModal('authModal');
             document.getElementById('authButtons').style.display = 'none';
             document.getElementById('profileBadge').style.display = 'flex';
-            document.getElementById('profileType').textContent = d.role.toUpperCase();
+            document.getElementById('profileType').textContent = d.name || d.role.toUpperCase();
+
+            // Populate dropdown header
+            const dn = document.getElementById('dropdownName');
+            const dr = document.getElementById('dropdownRole');
+            if (dn) dn.textContent = d.name || 'User';
+            if (dr) dr.textContent = d.role ? d.role.toUpperCase() : 'MEMBER';
 
             const avatarEl = document.getElementById('profileAvatar');
             const avatarKey = d.avatar;
